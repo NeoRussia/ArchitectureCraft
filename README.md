@@ -83,13 +83,6 @@ url = "https://<your-host>/architecturecraft-1.12-3.108-gtnh-shapes.jar"
 
 Then run `packwiz refresh` in the pack.
 
-## Status
-
-The fork builds cleanly with Zulu 8 and Gradle 4.1. The 23 shapes, models,
-lang keys, atlas cells and enum IDs have been statically verified. In-game
-testing is still required for rendering, collision, light 15, GUI alignment,
-sawbench output and save/load.
-
 ## Credits and licence
 
 See [CREDITS.md](CREDITS.md) for the per-contributor asset and code credits.
