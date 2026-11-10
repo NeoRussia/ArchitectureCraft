@@ -10,6 +10,8 @@ This is not an official TridentMC or GTNH release.
 
 *Distinguished architectural features for your Minecraft buildings.*
 
+![ArchitectureCraft: Reloaded](docs/images/reloaded.png)
+
 ## Current additions
 
 The shape IDs are the same as GTNH's fork, so existing IDs `0-93` are untouched:
