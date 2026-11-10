@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.elytradev.architecture.common.shape.EnumShapeSymmetry.*;
+import static com.elytradev.architecture.common.shape.ShapeFlags.GLOW;
 import static com.elytradev.architecture.common.shape.ShapeFlags.PLACE_OFFSET;
 import static com.elytradev.architecture.common.shape.ShapeFlags.PLACE_UNDERNEATH;
 import static java.lang.Math.abs;
@@ -148,6 +149,33 @@ public enum EnumShape {
     STAIRS(91, "architecturecraft.shape.stairs", ShapeKind.Model("stairs", Profile.Generic.lrStraight), BILATERAL, 3, 4, 0x0),
     STAIRS_OUTER_CORNER(92, "architecturecraft.shape.stairs_outer_corner", ShapeKind.Model("stairs_outer_corner", Profile.Generic.lrCorner), UNILATERAL, 2, 3, 0x0),
     STAIRS_INNER_CORNER(93, "architecturecraft.shape.stairs_inner_corner", ShapeKind.Model("stairs_inner_corner", Profile.Generic.rlCorner), UNILATERAL, 1, 1, 0x0),
+
+    // GTNH roof slopes, ported from GTNewHorizons/ArchitectureCraft (MIT, Copyright (c) 2016 gcewing).
+    SLOPE_TILE_A1(94, "architecturecraft.shape.slope_tile_a1", ShapeKind.Roof, BILATERAL, 1, 1, 0xcf),
+    SLOPE_TILE_A2(95, "architecturecraft.shape.slope_tile_a2", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f),
+    SLOPE_TILE_B1(96, "architecturecraft.shape.slope_tile_b1", ShapeKind.Roof, BILATERAL, 1, 1, 0xff),
+    SLOPE_TILE_B2(97, "architecturecraft.shape.slope_tile_b2", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf),
+    SLOPE_TILE_B3(98, "architecturecraft.shape.slope_tile_b3", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f),
+    SLOPE_TILE_C1(99, "architecturecraft.shape.slope_tile_c1", ShapeKind.Roof, BILATERAL, 1, 1, 0xff),
+    SLOPE_TILE_C2(100, "architecturecraft.shape.slope_tile_c2", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf),
+    SLOPE_TILE_C3(101, "architecturecraft.shape.slope_tile_c3", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f),
+    SLOPE_TILE_C4(102, "architecturecraft.shape.slope_tile_c4", ShapeKind.Roof, BILATERAL, 1, 4, 0x0f),
+
+    SLOPE_TILE_A1_SE(103, "architecturecraft.shape.slope_tile_a1_se", ShapeKind.Roof, BILATERAL, 1, 1, 0xcf, GLOW),
+    SLOPE_TILE_A2_SE(104, "architecturecraft.shape.slope_tile_a2_se", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f, GLOW),
+    SLOPE_TILE_B1_SE(105, "architecturecraft.shape.slope_tile_b1_se", ShapeKind.Roof, BILATERAL, 1, 1, 0xff, GLOW),
+    SLOPE_TILE_B2_SE(106, "architecturecraft.shape.slope_tile_b2_se", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf, GLOW),
+    SLOPE_TILE_B3_SE(107, "architecturecraft.shape.slope_tile_b3_se", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f, GLOW),
+    SLOPE_TILE_C1_SE(108, "architecturecraft.shape.slope_tile_c1_se", ShapeKind.Roof, BILATERAL, 1, 1, 0xff, GLOW),
+    SLOPE_TILE_C2_SE(109, "architecturecraft.shape.slope_tile_c2_se", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf, GLOW),
+    SLOPE_TILE_C3_SE(110, "architecturecraft.shape.slope_tile_c3_se", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f, GLOW),
+    SLOPE_TILE_C4_SE(111, "architecturecraft.shape.slope_tile_c4_se", ShapeKind.Roof, BILATERAL, 1, 4, 0x0f, GLOW),
+
+    ROOF_TILE_SE(112, "architecturecraft.shape.roof_tile_se", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf, GLOW),
+    SQUARE_SE(113, "architecturecraft.shape.square_se", ShapeKind.Model("square"), QUADRILATERAL, 1, 1, 0xff, GLOW),
+    SLAB_SE(114, "architecturecraft.shape.slab_se", ShapeKind.Model("slab"), QUADRILATERAL, 1, 2, 0x0f, GLOW),
+    ANGLED_ROOF_RIDGE(115, "architecturecraft.shape.angled_roof_ridge", ShapeKind.Model("angled_roof_ridge"), BILATERAL, 1, 4, 0x0f),
+    DOUBLE_ROOF_TILE(116, "architecturecraft.shape.double_roof_tile", ShapeKind.Model("double_roof_tile"), BILATERAL, 1, 2, 0xcf),
     ;
 
     public static EnumShape[] values = values();
@@ -304,5 +332,9 @@ public enum EnumShape {
 
     public boolean isCladding() {
         return this == CLADDING_SHEET;
+    }
+
+    public boolean isGlow() {
+        return (this.flags & GLOW) != 0;
     }
 }

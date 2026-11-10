@@ -116,7 +116,6 @@ public class GuiSawbench extends BaseGui.Screen {
         double h = shapeMenuHeight + 2 * shapeMenuMargin;
         this.drawTexturedRect(-shapeMenuMargin, -shapeMenuMargin, w, h,
                 0, 0, shapeMenuScale * w, shapeMenuScale * h);
-        this.bindTexture("gui/shapemenu_items.png", 512, 512);
         int p = this.te.selectedPage;
         if (p >= 0 && p < TileSawbench.pages.length) {
             ShapePage page = TileSawbench.pages[p];
@@ -126,7 +125,13 @@ public class GuiSawbench extends BaseGui.Screen {
                     EnumShape shape = shapes[i];
                     int mrow = i / shapeMenuCols, mcol = i % shapeMenuCols;
                     int id = shape.id;
-                    int trow = id / 10, tcol = id % 10;
+                    // Shape ids >= 110 use a second icon sheet, as in GTNH's fork.
+                    int textureSheet = id / 110;
+                    String texture = textureSheet == 0
+                            ? "gui/shapemenu_items.png"
+                            : "gui/shapemenu_items_" + textureSheet + ".png";
+                    this.bindTexture(texture, 512, 512);
+                    int trow = (id % 110) / 10, tcol = (id % 110) % 10;
                     this.drawTexturedRect(
                             (mcol + 0.5) * shapeMenuCellSize - 0.5 * shapeMenuItemWidth,
                             (mrow + 0.5) * shapeMenuCellSize - 0.5 * shapeMenuItemHeight,

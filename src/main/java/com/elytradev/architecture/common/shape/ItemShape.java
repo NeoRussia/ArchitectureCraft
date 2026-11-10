@@ -120,13 +120,7 @@ public class ItemShape extends ItemBlock {
                 if (shape.isCladding())
                     continue;
 
-                ItemStack defaultStack = new ItemStack(this, 1);
-                NBTTagCompound tag = new NBTTagCompound();
-                tag.setInteger("Shape", shape.id);
-                tag.setString("BaseName", Blocks.PLANKS.getRegistryName().toString());
-                tag.setInteger("BaseData", 0);
-                defaultStack.setTagCompound(tag);
-                items.add(defaultStack);
+                items.add(shape.kind.newStack(shape, Blocks.PLANKS.getDefaultState(), 1));
             }
         }
     }
