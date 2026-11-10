@@ -67,7 +67,44 @@ public class RenderRoof extends RenderShape {
     public void render() {
         switch (this.te.getShape()) {
             case ROOF_TILE:
+            case ROOF_TILE_SE:
                 this.renderSlope();
+                break;
+            case SLOPE_TILE_A1:
+            case SLOPE_TILE_A1_SE:
+                this.renderSlopeA1();
+                break;
+            case SLOPE_TILE_A2:
+            case SLOPE_TILE_A2_SE:
+                this.renderSlopeA2();
+                break;
+            case SLOPE_TILE_B1:
+            case SLOPE_TILE_B1_SE:
+                this.renderSlopeB1();
+                break;
+            case SLOPE_TILE_B2:
+            case SLOPE_TILE_B2_SE:
+                this.renderSlopeB2();
+                break;
+            case SLOPE_TILE_B3:
+            case SLOPE_TILE_B3_SE:
+                this.renderSlopeB3();
+                break;
+            case SLOPE_TILE_C1:
+            case SLOPE_TILE_C1_SE:
+                this.renderSlopeC1();
+                break;
+            case SLOPE_TILE_C2:
+            case SLOPE_TILE_C2_SE:
+                this.renderSlopeC2();
+                break;
+            case SLOPE_TILE_C3:
+            case SLOPE_TILE_C3_SE:
+                this.renderSlopeC3();
+                break;
+            case SLOPE_TILE_C4:
+            case SLOPE_TILE_C4_SE:
+                this.renderSlopeC4();
                 break;
             case ROOF_OUTER_CORNER:
                 this.renderOuterCorner();
@@ -137,6 +174,239 @@ public class RenderRoof extends RenderShape {
         if (this.renderSecondary)
             if (this.ridgeAt(0, 0, -1))
                 this.connectRidgeFront();
+    }
+
+    // Slope renderer methods ported from GTNewHorizons/ArchitectureCraft
+    // (MIT, Copyright (c) 2016 gcewing), adapted to the 1.12 render target API.
+
+    protected void renderSlopeA1() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(1.0, 0.5);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableFaceLeft(0, 0.5);
+            this.renderVariableTriangleLeft(0.5, 0.5);
+
+            this.renderVariableFaceRight(0, 0.5);
+            this.renderVariableTriangleRight(0.5, 0.5);
+
+            this.renderVariableFrontFace(0.5);
+
+            this.bottomQuad();
+            this.backQuad();
+        }
+    }
+
+    protected void renderSlopeA2() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(0.5, 0);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableTriangleLeft(0, 0.5);
+
+            this.renderVariableTriangleRight(0, 0.5);
+
+            this.bottomQuad();
+            this.renderVariableBackFace(0.5);
+        }
+    }
+
+    protected void renderSlopeB1() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(1.0, 0.66666);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableFaceLeft(0, 0.66666);
+            this.renderVariableTriangleLeft(0.66666, 0.33333);
+
+            this.renderVariableFaceRight(0, 0.66666);
+            this.renderVariableTriangleRight(0.66666, 0.33333);
+
+            this.renderVariableFrontFace(0.66666);
+
+            this.bottomQuad();
+            this.backQuad();
+        }
+    }
+
+    protected void renderSlopeB2() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(0.66666, 0.33333);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableFaceLeft(0, 0.33333);
+            this.renderVariableTriangleLeft(0.33333, 0.33333);
+
+            this.renderVariableFaceRight(0, 0.33333);
+            this.renderVariableTriangleRight(0.33333, 0.33333);
+
+            this.renderVariableFrontFace(0.33333);
+
+            this.bottomQuad();
+            this.renderVariableBackFace(0.66666);
+        }
+    }
+
+    protected void renderSlopeB3() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(0.33333, 0);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableTriangleLeft(0, 0.33333);
+
+            this.renderVariableTriangleRight(0, 0.33333);
+
+            this.bottomQuad();
+            this.renderVariableBackFace(0.33333);
+        }
+    }
+
+    protected void renderSlopeC1() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(1, 0.75);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableFaceLeft(0, 0.75);
+            this.renderVariableTriangleLeft(0.75, 0.25);
+
+            this.renderVariableFaceRight(0, 0.75);
+            this.renderVariableTriangleRight(0.75, 0.25);
+
+            this.renderVariableFrontFace(0.75);
+
+            this.bottomQuad();
+            this.backQuad();
+        }
+    }
+
+    protected void renderSlopeC2() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(0.75, 0.50);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableFaceLeft(0, 0.50);
+            this.renderVariableTriangleLeft(0.50, 0.25);
+
+            this.renderVariableFaceRight(0, 0.50);
+            this.renderVariableTriangleRight(0.50, 0.25);
+
+            this.renderVariableFrontFace(0.50);
+
+            this.bottomQuad();
+            this.renderVariableBackFace(0.75);
+        }
+    }
+
+    protected void renderSlopeC3() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(0.50, 0.25);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableFaceLeft(0, 0.25);
+            this.renderVariableTriangleLeft(0.25, 0.25);
+
+            this.renderVariableFaceRight(0, 0.25);
+            this.renderVariableTriangleRight(0.25, 0.25);
+
+            this.renderVariableFrontFace(0.25);
+
+            this.bottomQuad();
+            this.renderVariableBackFace(0.50);
+        }
+    }
+
+    protected void renderSlopeC4() {
+        if (this.renderSecondary) {
+            this.renderVariableSlope(0.25, 0);
+        }
+
+        if (this.renderBase) {
+            this.renderVariableTriangleLeft(0, 0.25);
+
+            this.renderVariableTriangleRight(0, 0.25);
+
+            this.bottomQuad();
+            this.renderVariableBackFace(0.25);
+        }
+    }
+
+    protected void renderVariableSlope(double start, double end) {
+        double dy = end - start;
+        double invLen = 1 / Math.sqrt(1 + dy * dy);
+        Vector3 n = new Vector3(0, invLen, invLen * dy);
+        this.beginInnerFaces(n);
+        this.beginQuad();
+        this.vertex(1, start, 1, 0, 0);
+        this.vertex(1, end, 0, 0, 1);
+        this.vertex(0, end, 0, 1, 1);
+        this.vertex(0, start, 1, 1, 0);
+        this.endFace();
+    }
+
+    protected void renderVariableTriangleLeft(double offset, double height) {
+        this.beginPosXFace();
+        this.beginTriangle();
+        this.vertex(1, offset + height, 1, 0, 0);
+        this.vertex(1, offset, 1, 0, 1 - height);
+        this.vertex(1, offset, 0, 1, 1 - height);
+        this.endFace();
+    }
+
+    protected void renderVariableTriangleRight(double offset, double height) {
+        this.beginNegXFace();
+        this.beginTriangle();
+        this.vertex(0, offset + height, 1, 1, 0);
+        this.vertex(0, offset, 0, 0, 1 - height);
+        this.vertex(0, offset, 1, 1, 1 - height);
+        this.endFace();
+    }
+
+    protected void renderVariableFaceLeft(double offset, double height) {
+        this.beginNegXFace();
+        this.beginQuad();
+        this.vertex(0, offset + height, 0, 0, 1 - height);
+        this.vertex(0, offset, 0, 0, 1);
+        this.vertex(0, offset, 1, 1, 1);
+        this.vertex(0, offset + height, 1, 1, 1 - height);
+        this.endFace();
+    }
+
+    protected void renderVariableFaceRight(double offset, double height) {
+        this.beginPosXFace();
+        this.beginQuad();
+        this.vertex(1, offset + height, 1, 0, 1 - height);
+        this.vertex(1, offset, 1, 0, 1);
+        this.vertex(1, offset, 0, 1, 1);
+        this.vertex(1, offset + height, 0, 1, 1 - height);
+        this.endFace();
+    }
+
+    protected void renderVariableFrontFace(double height) {
+        this.beginNegZFace();
+        this.beginQuad();
+        this.vertex(1, height, 0, 0, 1 - height);
+        this.vertex(1, 0, 0, 0, 1);
+        this.vertex(0, 0, 0, 1, 1);
+        this.vertex(0, height, 0, 1, 1 - height);
+        this.endFace();
+    }
+
+    protected void renderVariableBackFace(double height) {
+        this.beginPosZFace();
+        this.beginQuad();
+        this.vertex(0, height, 1, 0, 1 - height);
+        this.vertex(0, 0, 1, 0, 1);
+        this.vertex(1, 0, 1, 1, 1);
+        this.vertex(1, height, 1, 1, 1 - height);
+        this.endFace();
     }
 
     protected void renderOuterCorner() {

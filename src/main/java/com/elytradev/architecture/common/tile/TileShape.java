@@ -294,6 +294,12 @@ public class TileShape extends TileArchitecture {
     }
 
     @Override
+    public ItemStack newItemStack(int size) {
+        int light = this.shape != null && this.shape.isGlow() ? 15 : this.baseBlockState.getLightValue();
+        return blockStackWithTileEntity(this.getBlockType(), size, light, this);
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("shape", this.shape)
