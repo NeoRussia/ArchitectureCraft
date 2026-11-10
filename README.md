@@ -1,28 +1,15 @@
-<<<<<<< Updated upstream
-<img src="https://raw.githubusercontent.com/TridentMC/ArchitectureCraft/1.12/.github/logo.png" align="right" width="180px"/>
-
-# Architecture Craft - TridentMC
-[>> Downloads <<](https://github.com/TridentMC/ArchitectureCraft/releases)
-=======
 # ArchitectureCraft: Reloaded
 
 A 1.12.2 continuation of [TridentMC/ArchitectureCraft](https://github.com/TridentMC/ArchitectureCraft).
 The first addition is the 23 shape types from
 [GTNewHorizons/ArchitectureCraft](https://github.com/GTNewHorizons/ArchitectureCraft)
 which are missing from the 1.12 version. More features will follow.
->>>>>>> Stashed changes
+
+Based on TridentMC branch `1.12` at `8f85b04` (release `1.12-3.108`).
+This is not an official TridentMC or GTNH release.
 
 *Distinguished architectural features for your Minecraft buildings.*
 
-<<<<<<< Updated upstream
-**This mod is open source and under a permissive license.** And as such,
-can be included in any modpack on any platform without prior permission.
-We appreciate hearing about people using our mods, but you do not need
-to ask to use them. See the [LICENSE file](LICENSE) for more details.
-
-ArchitectureCraft provides a wide variety of good-looking architectural features including sloped roofs, glazable window frames, arches and other rounded blocks, classical pillars and entablatures, and railings for balconies and stairways.
-ArchitectureCraft blocks may be made from almost any vanilla material and many materials added by mods as well.
-=======
 ## Current additions
 
 The shape IDs are the same as GTNH's fork, so existing IDs `0-93` are untouched:
@@ -119,4 +106,3 @@ See [CREDITS.md](CREDITS.md) for the per-contributor asset and code credits.
 
 The project is MIT. See [LICENSE](LICENSE) and [NOTICE](NOTICE) for the
 upstream and GTNH notices.
->>>>>>> Stashed changes
