@@ -95,7 +95,7 @@ public abstract class ShapeKind {
 
     public ItemStack newStack(EnumShape shape, IBlockState materialState, int stackSize) {
         TileShape te = new TileShape(shape, materialState);
-        int light = te.getBaseBlockState().getLightValue();
+        int light = shape.isGlow() ? 15 : te.getBaseBlockState().getLightValue();
         return TileArchitecture.blockStackWithTileEntity(ArchitectureMod.CONTENT.blockShape, stackSize, light, te);
     }
 
