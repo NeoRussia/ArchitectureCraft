@@ -1,9 +1,7 @@
 # ArchitectureCraft: Reloaded
 
 A 1.12.2 continuation of [TridentMC/ArchitectureCraft](https://github.com/TridentMC/ArchitectureCraft).
-The first addition is the 23 shape types from
-[GTNewHorizons/ArchitectureCraft](https://github.com/GTNewHorizons/ArchitectureCraft)
-which are missing from the 1.12 version. More features will follow.
+More features will follow.
 
 Based on TridentMC branch `1.12` at `8f85b04` (release `1.12-3.108`).
 This is not an official TridentMC or GTNH release.
@@ -55,38 +53,6 @@ $env:JAVA_HOME = "<path-to-a-JDK-8>"
 $env:GRADLE_USER_HOME = "$PWD\.gradle-home"
 .\gradlew.bat build --console=plain
 ```
-
-The build produces:
-
-```text
-architecturecraft-1.12.2-3.108-reloaded.1.jar
-SHA256 7EB5A6C0731C70D25E8363024BB6B734C7422F36A439B108B366B295AAF45929
-```
-
-## Install
-
-This replaces the upstream ArchitectureCraft jar; do not keep both:
-
-1. Back up `mods/architecturecraft-1.12-3.108.jar`.
-2. Remove it.
-3. Put `architecturecraft-1.12.2-3.108-reloaded.1.jar` in `mods/`.
-4. Launch and check the sawbench **Other** and **Glow** pages.
-
-For packwiz, host the jar and add a URL download entry:
-
-```toml
-name = "ArchitectureCraft: Reloaded"
-filename = "architecturecraft-1.12.2-3.108-reloaded.1.jar"
-side = "both"
-
-[download]
-hash-format = "sha256"
-hash = "7EB5A6C0731C70D25E8363024BB6B734C7422F36A439B108B366B295AAF45929"
-mode = "url"
-url = "https://<your-host>/architecturecraft-1.12.2-3.108-reloaded.1.jar"
-```
-
-Then run `packwiz refresh` in the pack.
 
 ## Credits and licence
 
