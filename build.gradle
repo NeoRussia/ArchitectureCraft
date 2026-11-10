@@ -193,7 +193,8 @@ minecraft {
 
     runDir = "minecraft"
 
-    replaceIn 'src/main/java/' + project.ext.package.replace('.', '/') + '/' + project.ext.projectName + '.java'
+    // The skeleton's package/projectName path does not match ArchitectureMod's package.
+    replaceIn 'src/main/java/com/elytradev/architecture/common/ArchitectureMod.java'
     replace '@VERSION@', project.version
 
     if (project.ext.coremod) {

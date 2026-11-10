@@ -4,8 +4,8 @@ ext {
     group = 'com.elytradev'
     projectName = 'architecturecraft'
 
-    useElytraVersionFormat = true
-    version = '3'
+    useElytraVersionFormat = false
+    version = '1.12.2-3.108-reloaded.1'
 
     concreteVersion = '0.3.3-SNAPSHOT'
     concreteModules = ['all']

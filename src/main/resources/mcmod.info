@@ -1,14 +1,15 @@
 [
     {
         "modid": "architecturecraft",
-        "name": "ArchitectureCraft",
-        "description": "Distinguished architectural features for your Minecraft buildings.",
-        "version": "@VERSION@",
+        "name": "ArchitectureCraft: Reloaded",
+        "description": "A 1.12.2 continuation of ArchitectureCraft with additional shapes and features.",
+        "version": "${version}",
         "logoFile": "assets/examplemod/textures/logo.png",
-        "url": "https://github.com/elytra/ArchitectureCraft",
+        "url": "https://github.com/NeoRussia/architecturecraft-reloaded",
         "authorList": [
             "gcewing (Original Developer)",
-            "darkevilmac (Maintainer)"
+            "darkevilmac (1.12 port)",
+            "Reloaded contributors"
         ]
     }
 ]

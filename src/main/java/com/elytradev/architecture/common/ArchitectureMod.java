@@ -39,9 +39,9 @@ import static com.elytradev.architecture.common.ArchitectureMod.*;
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VER)
 public class ArchitectureMod {
-    public static final String MOD_NAME = "ArchitectureCraft";
+    public static final String MOD_NAME = "ArchitectureCraft: Reloaded";
     public static final String MOD_ID = "architecturecraft";
-    public static final String MOD_VER = "@VERSION@";
+    public static final String MOD_VER = "1.12.2-3.108-reloaded.1";
     public static final String RESOURCE_DOMAIN = "architecturecraft:";
 
     public static final ArchitectureContent CONTENT = new ArchitectureContent();
