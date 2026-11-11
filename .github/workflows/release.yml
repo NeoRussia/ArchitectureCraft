@@ -1,0 +1,100 @@
+name: Release
+
+# Builds the mod and attaches both jars to a GitHub release.
+#
+# The tag is the version: push `v3.108-0.1`, or run the workflow by hand with
+# that tag. The jar name comes from `releaseName` in project.gradle, and the
+# run fails if the tag does not appear in it, so a forgotten version bump is
+# caught here instead of shipping a mislabelled download.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release, for example v3.108-0.1'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      # Tag push uses the pushed name; a manual run takes the input.
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      # ForgeGradle 2.3 unpacks a lot; the default 512m heap is not enough.
+      GRADLE_OPTS: -Xmx2g
+    steps:
+      - uses: actions/checkout@v4
+
+      # The wrapper is Gradle 4.1 and ForgeGradle 2.3 refuses anything newer
+      # than Java 8, which is also what the mod compiles against.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      # ForgeGradle downloads a whole Minecraft/MCP toolchain on a cold run;
+      # keys change only when the wrapper or the build scripts do.
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('build.gradle', 'project.gradle') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Build
+        run: ./gradlew build --no-daemon --console=plain --stacktrace
+
+      - name: Read the jar name
+        id: jar
+        shell: bash
+        run: |
+          set -euo pipefail
+          main="$(ls build/libs/*.jar | grep -v -- '-sources.jar' | head -n 1)"
+          echo "name=$(basename "$main" .jar)" >> "$GITHUB_OUTPUT"
+          ls -l build/libs
+
+      - name: Check the jar name matches the tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          short="${TAG#v}"
+          case "${{ steps.jar.outputs.name }}" in
+            *"$short"*)
+              echo "jar agrees with the tag: ${{ steps.jar.outputs.name }} <- $TAG"
+              ;;
+            *)
+              echo "::error::built ${{ steps.jar.outputs.name }} but tagged $TAG; bump releaseName in project.gradle"
+              exit 1
+              ;;
+          esac
+
+      - name: Checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd build/libs
+          sha256sum *.jar > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: ${{ steps.jar.outputs.name }}
+          files: |
+            build/libs/*.jar
+            build/libs/SHA256SUMS.txt
+          fail_on_unmatched_files: true
+          generate_release_notes: true
