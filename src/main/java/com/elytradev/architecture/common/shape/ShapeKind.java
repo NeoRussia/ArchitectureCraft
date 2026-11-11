@@ -88,6 +88,15 @@ public abstract class ShapeKind {
         return 0;
     }
 
+    /**
+     * Extra quarter turns applied only when the shape is drawn as an item.
+     * Shapes with readable artwork (a logo, lettering) use this so the item
+     * shows the face a player is meant to read; everything else stays at 0.
+     */
+    public int itemTurnOffset() {
+        return 0;
+    }
+
     public abstract void renderShape(TileShape te,
                                      ITexture[] textures, RenderTargetBase target, Trans3 t,
                                      boolean renderBase, boolean renderSecondary,
@@ -95,6 +104,8 @@ public abstract class ShapeKind {
 
     public ItemStack newStack(EnumShape shape, IBlockState materialState, int stackSize) {
         TileShape te = new TileShape(shape, materialState);
+        te.setSide(shape.defaultSide);
+        te.setTurn(shape.defaultTurn);
         int light = shape.isGlow() ? 15 : te.getBaseBlockState().getLightValue();
         return TileArchitecture.blockStackWithTileEntity(ArchitectureMod.CONTENT.blockShape, stackSize, light, te);
     }
@@ -205,6 +216,14 @@ public abstract class ShapeKind {
         return false;
     }
 
+    /**
+     * Light lost when entering this shape's block, 0-255, as in vanilla
+     * light opacity. Solid shapes stop the light, see-through ones do not.
+     */
+    public int getLightOpacity() {
+        return 15;
+    }
+
     //------------------------------------------------------------------------------
 
     public boolean isValidSecondaryMaterial(IBlockState state) {
@@ -298,7 +317,7 @@ public abstract class ShapeKind {
 
         @Override
         public Object profileForLocalFace(EnumShape shape, EnumFacing face) {
-            switch (shape) {
+            switch (shape.getRoofBase()) {
                 case ROOF_TILE:
                 case ROOF_OVERHANG:
                     switch (face) {
@@ -378,6 +397,23 @@ public abstract class ShapeKind {
             return this.model;
         }
 
+        /**
+         * Fraction of a block the model actually fills: 1.0 for a full cube,
+         * 0.5 for a slab, and so on. Used for the light opacity tier.
+         */
+        public double getFilledVolume() {
+            OBJSONModel model = (OBJSONModel) this.getModel();
+            if (model.boxes != null && model.boxes.length > 0) {
+                double volume = 0;
+                for (double[] b : model.boxes)
+                    volume += (b[3] - b[0]) * (b[4] - b[1]) * (b[5] - b[2]);
+                return Math.min(1.0, volume);
+            }
+            AxisAlignedBB bounds = model.getBounds();
+            return Math.min(1.0, (bounds.maxX - bounds.minX)
+                    * (bounds.maxY - bounds.minY) * (bounds.maxZ - bounds.minZ));
+        }
+
         @Override
         public boolean acceptsCladding() {
             OBJSONModel model = (OBJSONModel) this.getModel();
@@ -412,6 +448,11 @@ public abstract class ShapeKind {
     }
 
     public static abstract class Window extends ShapeKind {
+
+        @Override
+        public int getLightOpacity() {
+            return 0;
+        }
 
         public EnumFacing[] frameSides;
 
@@ -579,6 +620,11 @@ public abstract class ShapeKind {
     //------------------------------------------------------------------------------
 
     public static class Cladding extends ShapeKind {
+
+        @Override
+        public int getLightOpacity() {
+            return 0;
+        }
 
         @Override
         public void renderShape(TileShape te,

@@ -124,8 +124,9 @@ public class GuiSawbench extends BaseGui.Screen {
                 for (int i = 0; i < shapes.length; i++) {
                     EnumShape shape = shapes[i];
                     int mrow = i / shapeMenuCols, mcol = i % shapeMenuCols;
-                    int id = shape.id;
-                    // Shape ids >= 110 use a second icon sheet, as in GTNH's fork.
+                    int id = shape.iconId;
+                    // Icon ids >= 110 use the second icon sheet, as in GTNH's fork.
+                    // Siding and paneling have their own icons next to the fence icons.
                     int textureSheet = id / 110;
                     String texture = textureSheet == 0
                             ? "gui/shapemenu_items.png"

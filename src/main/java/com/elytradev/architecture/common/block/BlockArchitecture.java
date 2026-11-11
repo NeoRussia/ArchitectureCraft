@@ -436,6 +436,22 @@ public class BlockArchitecture<TE extends TileArchitecture>
         return true;
     }
 
+    // No @Override: addRunningEffects was added in Forge 14.23.5, after this
+    // mod's 14.23.4 compile target. The method still overrides at runtime on
+    // the 14.23.5 build the pack ships.
+    public boolean addRunningEffects(IBlockState state, World world, BlockPos pos, Entity entity) {
+        // Shapes have no particle sprite of their own; use the material they
+        // are made of, or sprinting leaves a trail of missing textures.
+        IBlockState particleState = getParticleState(world, pos);
+        world.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
+                entity.posX + (world.rand.nextFloat() - 0.5) * entity.width,
+                entity.getEntityBoundingBox().minY + 0.1,
+                entity.posZ + (world.rand.nextFloat() - 0.5) * entity.width,
+                -entity.motionX * 4.0, 1.5, -entity.motionZ * 4.0,
+                Block.getStateId(particleState));
+        return true;
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public boolean addHitEffects(IBlockState blockState, World world, RayTraceResult target, ParticleManager pm) {
@@ -498,8 +514,10 @@ public class BlockArchitecture<TE extends TileArchitecture>
     }
 
     public IBlockState getParticleState(IBlockAccess world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
-        return getActualState(state, world, pos);
+        // Particle states must be normal states. The extended state carries the
+        // unlisted block access/pos properties, is not in the baked model store,
+        // and resolves its particle sprite to the missing model.
+        return world.getBlockState(pos);
     }
 
     @Override

@@ -77,12 +77,20 @@ public class TileSawbench extends TileArchitectureInventory {
                     EnumShape.CLADDING_SHEET, EnumShape.SLAB, EnumShape.STAIRS, EnumShape.STAIRS_OUTER_CORNER, EnumShape.STAIRS_INNER_CORNER,
                     EnumShape.SLOPE_TILE_A1, EnumShape.SLOPE_TILE_A2, EnumShape.SLOPE_TILE_B1, EnumShape.SLOPE_TILE_B2, EnumShape.SLOPE_TILE_B3,
                     EnumShape.SLOPE_TILE_C1, EnumShape.SLOPE_TILE_C2, EnumShape.SLOPE_TILE_C3, EnumShape.SLOPE_TILE_C4,
-                    EnumShape.ANGLED_ROOF_RIDGE, EnumShape.DOUBLE_ROOF_TILE),
+                    EnumShape.ANGLED_ROOF_RIDGE, EnumShape.DOUBLE_ROOF_TILE, EnumShape.WALL, EnumShape.FENCE, EnumShape.GREG_TECH),
             new ShapePage("architecturecraft.shapepage.glow",
                     EnumShape.SQUARE_SE, EnumShape.SLAB_SE, EnumShape.ROOF_TILE_SE,
                     EnumShape.SLOPE_TILE_A1_SE, EnumShape.SLOPE_TILE_A2_SE, EnumShape.SLOPE_TILE_B1_SE,
                     EnumShape.SLOPE_TILE_B2_SE, EnumShape.SLOPE_TILE_B3_SE, EnumShape.SLOPE_TILE_C1_SE,
                     EnumShape.SLOPE_TILE_C2_SE, EnumShape.SLOPE_TILE_C3_SE, EnumShape.SLOPE_TILE_C4_SE),
+            new ShapePage("architecturecraft.shapepage.siding",
+                    EnumShape.ROOF_TILE_SIDING,
+                    EnumShape.SLOPE_TILE_A1_SIDING, EnumShape.SLOPE_TILE_A2_SIDING,
+                    EnumShape.SLOPE_TILE_B1_SIDING, EnumShape.SLOPE_TILE_B2_SIDING,
+                    EnumShape.SLOPE_TILE_B3_SIDING,
+                    EnumShape.SLOPE_TILE_C1_SIDING, EnumShape.SLOPE_TILE_C2_SIDING,
+                    EnumShape.SLOPE_TILE_C3_SIDING, EnumShape.SLOPE_TILE_C4_SIDING,
+                    EnumShape.PANELING, EnumShape.DOUBLE_SIDING),
     };
 
     public IInventory inventory = new InventoryBasic("Items", false, 2);

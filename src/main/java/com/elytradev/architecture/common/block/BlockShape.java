@@ -26,6 +26,7 @@ package com.elytradev.architecture.common.block;
 
 import com.elytradev.architecture.common.helpers.Trans3;
 import com.elytradev.architecture.common.helpers.Vector3;
+import com.elytradev.architecture.common.shape.ConnectedShape;
 import com.elytradev.architecture.common.tile.TileShape;
 import com.elytradev.architecture.legacy.base.BaseOrientation;
 import net.minecraft.block.Block;
@@ -201,8 +202,42 @@ public class BlockShape extends BlockArchitecture<TileShape> {
     }
 
     @Override
+    public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        TileShape te = TileShape.get(world, pos);
+        if (te == null || te.getShape() == null)
+            return false;
+        int mask = te.getShape().occlusionMask;
+        if ((mask & 0xff00) != 0)
+            return false; // not a 2x2x2 cubelet mask
+        int faceMask;
+        switch (Trans3.sideTurn(te.getSide(), te.getTurn()).it(side)) {
+            case DOWN:
+                faceMask = 0x0f;
+                break;
+            case UP:
+                faceMask = 0xf0;
+                break;
+            case NORTH:
+                faceMask = 0x33;
+                break;
+            case SOUTH:
+                faceMask = 0xcc;
+                break;
+            case WEST:
+                faceMask = 0x55;
+                break;
+            case EAST:
+                faceMask = 0xaa;
+                break;
+            default:
+                return false;
+        }
+        return (mask & faceMask) == faceMask;
+    }
+
+    @Override
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-        return BlockFaceShape.UNDEFINED;
+        return this.isSideSolid(state, worldIn, pos, face) ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
     }
 
     @Override
@@ -363,6 +398,18 @@ public class BlockShape extends BlockArchitecture<TileShape> {
     }
 
     @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        // Connected shapes derive their arms or rails from the world, so a
+        // neighbour appearing or disappearing has to force a re-render.
+        TileShape te = TileShape.get(world, pos);
+        if (te != null) {
+            te.invalidateLightOpacity();
+            if (te.getShape() != null && te.getShape().kind instanceof ConnectedShape)
+                BlockHelper.markBlockForUpdate(world, pos);
+        }
+    }
+
+    @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
         return true;
     }
@@ -370,12 +417,22 @@ public class BlockShape extends BlockArchitecture<TileShape> {
     @SideOnly(Side.CLIENT)
     @Override
     public float getAmbientOcclusionLightValue(IBlockState state) {
-        return 0.8f;
+        return 1.0f;
     }
 
     @Override
     public int getLightValue(IBlockState state) {
         return state.getValue(LIGHT);
+    }
+
+    @Override
+    public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+        // Without this the block reports the default for a non-opaque cube (0),
+        // so skylight and block light pass straight through every shape.
+        TileShape te = TileShape.get(world, pos);
+        if (te != null)
+            return te.getLightOpacity();
+        return 15;
     }
 
 }

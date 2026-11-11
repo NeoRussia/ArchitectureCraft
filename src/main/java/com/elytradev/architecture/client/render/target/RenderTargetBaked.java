@@ -216,7 +216,11 @@ public class RenderTargetBaked extends RenderTargetBase {
                     this.putElement(e, p.x, p.y, p.z);
                     break;
                 case COLOR:
-                    this.putElement(e, this.alpha, this.blue, this.green, this.red);
+                    // The world target folds the face shade into its lightmap; the
+                    // baked target has no lightmap, so bake the shade into the
+                    // vertex colour or 3D item models render full-bright.
+                    this.putElement(e, this.alpha, this.blue * this.shade,
+                            this.green * this.shade, this.red * this.shade);
                     break;
                 case NORMAL:
                     this.putElement(e, this.normal.x, this.normal.y, this.normal.z);

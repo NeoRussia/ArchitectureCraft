@@ -173,7 +173,7 @@ public abstract class RenderTargetBase {
         switch (face) {
             case DOWN:
                 u = x;
-                v = 1 - z;
+                v = z;
                 break;
             case UP:
                 u = x;

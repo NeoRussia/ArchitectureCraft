@@ -28,6 +28,7 @@ import com.elytradev.architecture.client.render.CustomBlockDispatcher;
 import com.elytradev.architecture.client.render.PreviewRenderer;
 import com.elytradev.architecture.client.render.RenderingManager;
 import com.elytradev.architecture.client.render.shape.RenderCladding;
+import com.elytradev.architecture.client.render.item.RenderHashBrown;
 import com.elytradev.architecture.client.render.shape.RenderWindow;
 import com.elytradev.architecture.client.render.shape.ShapeRenderDispatch;
 import com.elytradev.architecture.common.ArchitectureContent;
@@ -41,6 +42,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -132,6 +134,14 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onModelBakeEvent(ModelBakeEvent e) {
+        // The custom block models exist only for their particle textures (the
+        // world renderer draws them directly). Put them in the registry so
+        // BlockModelShapes.getTexture(state) finds their particle sprite
+        // instead of a missing model.
+        for (IBakedModel model : RENDERING_MANAGER.getBakedModels()) {
+            if (model instanceof RenderingManager.CustomBakedModel)
+                ((RenderingManager.CustomBakedModel) model).install(e);
+        }
         RENDERING_MANAGER.getItemBakedModel().install(e);
     }
 
@@ -148,6 +158,10 @@ public class ClientProxy extends CommonProxy {
 
         for (Item item : ArchitectureContent.registeredItems.values())
             RENDERING_MANAGER.registerSprites(1, e.getMap(), item);
+
+        // The hash brown is not a shape, so its texture is stitched directly
+        // rather than through the block or item texture name lists.
+        e.getMap().registerSprite(RenderHashBrown.TEXTURE);
     }
 
     @Override
@@ -159,5 +173,6 @@ public class ClientProxy extends CommonProxy {
     public void registerCustomRenderers() {
         RENDERING_MANAGER.addBlockRenderer(ArchitectureMod.CONTENT.blockShape, SHAPE_RENDER_DISPATCHER);
         RENDERING_MANAGER.addItemRenderer(ArchitectureMod.CONTENT.itemCladding, new RenderCladding());
+        RENDERING_MANAGER.addItemRenderer(ArchitectureMod.CONTENT.itemHashBrown, new RenderHashBrown());
     }
 }

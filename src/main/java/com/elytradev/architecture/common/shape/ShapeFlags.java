@@ -30,5 +30,6 @@ public class ShapeFlags {
     public final static int PLACE_UNDERNEATH = 1; // Reverses the upside down placement option
     public final static int PLACE_OFFSET = 2; // Offset to left or right side along X axis
     public final static int GLOW = 4; // Forces the placed shape to emit light level 15
+    public final static int SIDING = 8; // Roof shapes placed upright on walls instead of flat
 
 }
