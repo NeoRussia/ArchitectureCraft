@@ -141,7 +141,11 @@ if (needsShadow) {
     }
 
     tasks.reobfJar.doLast {
-        file('build/libs/' + archivesBaseName + '-' + version + '-slim.jar').delete()
+        // The slim jar exists only to be reobfuscated into the shadow jar, so
+        // drop it by its real path instead of guessing the name from
+        // archivesBaseName and version.
+        def slim = tasks.jar.archivePath
+        if (tasks.jar.classifier == 'slim') slim.delete()
     }
 
     tasks.build.dependsOn reobfShadowJar
@@ -159,6 +163,17 @@ if (needsShadow) {
             shadow 'com.elytradev:mini:' + project.ext.miniVersion
             compile 'com.elytradev:mini:' + project.ext.miniVersion
         }
+    }
+}
+
+// Release file name. `releaseName` (project.gradle) only sets what the jar is
+// called on disk; `version` still feeds mcmod.info and the @VERSION@
+// replacement. Every Jar task keeps its classifier, so the slim jar and the
+// sources jar stay `<releaseName>-slim.jar` and `<releaseName>-sources.jar`.
+if (project.ext.has('releaseName') && project.ext.releaseName) {
+    def releaseName = project.ext.releaseName
+    tasks.withType(org.gradle.api.tasks.bundling.Jar) {
+        archiveName = releaseName + (classifier ? '-' + classifier : '') + '.jar'
     }
 }
 
