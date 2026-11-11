@@ -6,7 +6,7 @@ More features will follow.
 Based on TridentMC branch `1.12` at `8f85b04` (release `1.12-3.108`).
 This is not an official TridentMC release.
 
-*Distinguished architectural features for your Minecraft buildings, restyled for Kyn's sensibilities*
+*Distinguished architectural features for your Minecraft buildings, restyled for Kyn's sensibilities.*
 
 ![ArchitectureCraft: Reloaded](docs/images/reloaded.png)
 
