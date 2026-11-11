@@ -60,27 +60,24 @@ the same connection rules as the wall (including `disabledConnections`), has
 no rotation and no cladding. Collision is 1.5 blocks high, as in vanilla, so
 the fence cannot be jumped over from flat ground; the selection box stays the
 post. One material block makes four fences.
-### Siding
-The Siding page holds upright versions of Roof Tile and the nine slopes.
+
+### Siding
+
+The Siding page holds upright versions of Roof Tile and the nine slopes.
 They use the same geometry, profiles and connections as the roofing shapes but
 always place on their side: on a wall the visible face points out of the wall,
 on the floor or ceiling the piece stands upright facing the player. The sloped
 face uses the model's own UVs with the grain turned, so a wall piece does not
 show its material sideways. Each entry has its own shape ID, so the roofing
 shapes are unchanged.
-Paneling is a 3 px vertical panel, flush with the block boundary, that mounts
+
+Paneling is a 3 px vertical panel, flush with the block boundary, that mounts
 on the face you click. Cladding can be applied to its room-facing side. One
 material block makes four panels.
 
 Double Siding is a full block split vertically down the middle: one half is
 the base material, the other takes the cladding material. Without cladding the
 whole block reads as the base material.
-
-### Hash Brown
-
-A stand-alone easter-egg item with its own id (`architecturecraft:hash_brown`)
-and assets. It is not a shape, a block or a fitting, and shares no registry
-entry with them.
 
 ## Compatibility
 
