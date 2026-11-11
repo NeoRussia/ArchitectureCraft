@@ -53,19 +53,22 @@ public class RenderRoof extends RenderShape {
     protected EnumFacing face;
     protected boolean outerFace;
     protected boolean renderBase, renderSecondary;
+    /** Siding shapes rotate the grain on their sloped faces so it reads upright. */
+    protected boolean siding;
 
     public RenderRoof(TileShape te, ITexture[] textures, Trans3 t, RenderTargetBase target,
                       boolean renderBase, boolean renderSecondary, int baseColourMult, int secondaryColourMult) {
         super(te, textures, t, target);
         this.renderBase = renderBase;
         this.renderSecondary = renderSecondary;
+        this.siding = te.getShape().isSiding();
         this.setBaseColourMult(baseColourMult);
         this.setSecondaryColourMult(secondaryColourMult);
     }
 
     @Override
     public void render() {
-        switch (this.te.getShape()) {
+        switch (this.te.getShape().getRoofBase()) {
             case ROOF_TILE:
             case ROOF_TILE_SE:
                 this.renderSlope();
@@ -1012,7 +1015,7 @@ public class RenderRoof extends RenderShape {
         TileShape nte = this.te.getConnectedNeighbourGlobal(dir);
         if (nte != null) {
             for (int i = 0; i < shapes.length; i++)
-                if (nte.getShape() == shapes[i])
+                if (nte.getShape().getRoofBase() == shapes[i])
                     return true;
         }
         return false;
@@ -1105,6 +1108,21 @@ public class RenderRoof extends RenderShape {
     }
 
     protected void vertex(double x, double y, double z, double u, double v) {
+        if (this.siding && !this.outerFace) {
+            // The sloped face's model UVs are laid out for a flat roof, so the
+            // grain has to be turned to read upright once the piece is on the
+            // wall. The quarter turn used by siding needs a 90 degree turn of
+            // the grain; the flat placements keep the other corrections.
+            int t = this.te.getTurn() & 3;
+            double su = u;
+            if (t == 3 || t == 1) {
+                u = v;
+                v = 1 - su;
+            } else if (t == 0) {
+                u = 1 - u;
+                v = 1 - v;
+            }
+        }
         Vector3 q = this.t.p(x - 0.5, y - 0.5, z - 0.5);
         this.target.addVertex(q, u, v);
     }

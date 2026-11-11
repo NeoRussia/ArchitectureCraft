@@ -43,6 +43,7 @@ import static com.elytradev.architecture.common.shape.EnumShapeSymmetry.*;
 import static com.elytradev.architecture.common.shape.ShapeFlags.GLOW;
 import static com.elytradev.architecture.common.shape.ShapeFlags.PLACE_OFFSET;
 import static com.elytradev.architecture.common.shape.ShapeFlags.PLACE_UNDERNEATH;
+import static com.elytradev.architecture.common.shape.ShapeFlags.SIDING;
 import static java.lang.Math.abs;
 
 public enum EnumShape {
@@ -145,10 +146,10 @@ public enum EnumShape {
 
     BANISTER_PLAIN_INNER_CORNER(88, "architecturecraft.shape.banister_plain_inner_corner", ShapeKind.Model("balustrade_stair_plain_inner_corner"), UNILATERAL, 1, 6, 0x0),
 
-    SLAB(90, "architecturecraft.shape.slab", ShapeKind.Model("slab"), QUADRILATERAL, 1, 2, 0x0),
-    STAIRS(91, "architecturecraft.shape.stairs", ShapeKind.Model("stairs", Profile.Generic.lrStraight), BILATERAL, 3, 4, 0x0),
-    STAIRS_OUTER_CORNER(92, "architecturecraft.shape.stairs_outer_corner", ShapeKind.Model("stairs_outer_corner", Profile.Generic.lrCorner), UNILATERAL, 2, 3, 0x0),
-    STAIRS_INNER_CORNER(93, "architecturecraft.shape.stairs_inner_corner", ShapeKind.Model("stairs_inner_corner", Profile.Generic.rlCorner), UNILATERAL, 1, 1, 0x0),
+    SLAB(90, "architecturecraft.shape.slab", ShapeKind.Model("slab"), QUADRILATERAL, 1, 2, 0x0f),
+    STAIRS(91, "architecturecraft.shape.stairs", ShapeKind.Model("stairs", Profile.Generic.lrStraight), BILATERAL, 3, 4, 0xcf),
+    STAIRS_OUTER_CORNER(92, "architecturecraft.shape.stairs_outer_corner", ShapeKind.Model("stairs_outer_corner", Profile.Generic.lrCorner), UNILATERAL, 2, 3, 0x4f),
+    STAIRS_INNER_CORNER(93, "architecturecraft.shape.stairs_inner_corner", ShapeKind.Model("stairs_inner_corner", Profile.Generic.rlCorner), UNILATERAL, 1, 1, 0xdf),
 
     // GTNH roof slopes, ported from GTNewHorizons/ArchitectureCraft (MIT, Copyright (c) 2016 gcewing).
     SLOPE_TILE_A1(94, "architecturecraft.shape.slope_tile_a1", ShapeKind.Roof, BILATERAL, 1, 1, 0xcf),
@@ -176,6 +177,27 @@ public enum EnumShape {
     SLAB_SE(114, "architecturecraft.shape.slab_se", ShapeKind.Model("slab"), QUADRILATERAL, 1, 2, 0x0f, GLOW),
     ANGLED_ROOF_RIDGE(115, "architecturecraft.shape.angled_roof_ridge", ShapeKind.Model("angled_roof_ridge"), BILATERAL, 1, 4, 0x0f),
     DOUBLE_ROOF_TILE(116, "architecturecraft.shape.double_roof_tile", ShapeKind.Model("double_roof_tile"), BILATERAL, 1, 2, 0xcf),
+
+    // Clean-room wall inspired by Industrial Renewal's wall_concrete.
+    WALL(117, "architecturecraft.shape.wall", new Wall(), QUADRILATERAL, 1, 2, 0x0),
+    FENCE(118, "architecturecraft.shape.fence", new Fence(), QUADRILATERAL, 1, 4, 0x0),
+
+    // Siding: the roofing shapes mounted upright on walls. Same geometry and
+    // profiles, but placement always stands them on their side.
+    ROOF_TILE_SIDING(119, "architecturecraft.shape.roof_tile_siding", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf, SIDING),
+    SLOPE_TILE_A1_SIDING(120, "architecturecraft.shape.slope_tile_a1_siding", ShapeKind.Roof, BILATERAL, 1, 1, 0xcf, SIDING),
+    SLOPE_TILE_A2_SIDING(121, "architecturecraft.shape.slope_tile_a2_siding", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f, SIDING),
+    SLOPE_TILE_B1_SIDING(122, "architecturecraft.shape.slope_tile_b1_siding", ShapeKind.Roof, BILATERAL, 1, 1, 0xff, SIDING),
+    SLOPE_TILE_B2_SIDING(123, "architecturecraft.shape.slope_tile_b2_siding", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf, SIDING),
+    SLOPE_TILE_B3_SIDING(124, "architecturecraft.shape.slope_tile_b3_siding", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f, SIDING),
+    SLOPE_TILE_C1_SIDING(125, "architecturecraft.shape.slope_tile_c1_siding", ShapeKind.Roof, BILATERAL, 1, 1, 0xff, SIDING),
+    SLOPE_TILE_C2_SIDING(126, "architecturecraft.shape.slope_tile_c2_siding", ShapeKind.Roof, BILATERAL, 1, 2, 0xcf, SIDING),
+    SLOPE_TILE_C3_SIDING(127, "architecturecraft.shape.slope_tile_c3_siding", ShapeKind.Roof, BILATERAL, 1, 3, 0x0f, SIDING),
+    SLOPE_TILE_C4_SIDING(128, "architecturecraft.shape.slope_tile_c4_siding", ShapeKind.Roof, BILATERAL, 1, 4, 0x0f, SIDING),
+
+    PANELING(129, "architecturecraft.shape.paneling", new Paneling(), QUADRILATERAL, 1, 4, 0x0),
+    DOUBLE_SIDING(130, "architecturecraft.shape.double_siding", ShapeKind.Model("double_siding"), QUADRILATERAL, 1, 1, 0xff),
+    GREG_TECH(131, "architecturecraft.shape.greg_tech", new Logo(), QUADRILATERAL, 1, 1, 0x0),
     ;
 
     public static EnumShape[] values = values();
@@ -185,6 +207,22 @@ public enum EnumShape {
     static {
         for (EnumShape s : values)
             idMap.put(s.id, s);
+        mapSiding(ROOF_TILE_SIDING, ROOF_TILE);
+        mapSiding(SLOPE_TILE_A1_SIDING, SLOPE_TILE_A1);
+        mapSiding(SLOPE_TILE_A2_SIDING, SLOPE_TILE_A2);
+        mapSiding(SLOPE_TILE_B1_SIDING, SLOPE_TILE_B1);
+        mapSiding(SLOPE_TILE_B2_SIDING, SLOPE_TILE_B2);
+        mapSiding(SLOPE_TILE_B3_SIDING, SLOPE_TILE_B3);
+        mapSiding(SLOPE_TILE_C1_SIDING, SLOPE_TILE_C1);
+        mapSiding(SLOPE_TILE_C2_SIDING, SLOPE_TILE_C2);
+        mapSiding(SLOPE_TILE_C3_SIDING, SLOPE_TILE_C3);
+        mapSiding(SLOPE_TILE_C4_SIDING, SLOPE_TILE_C4);
+    }
+
+    private static void mapSiding(EnumShape siding, EnumShape base) {
+        siding.roofBase = base;
+        siding.defaultSide = 2;
+        siding.defaultTurn = 3;
     }
 
     public int id;
@@ -195,6 +233,16 @@ public enum EnumShape {
     public int itemsProduced;
     public int occlusionMask;
     public int flags;
+    /**
+     * The roofing shape this one renders as and connects to. Normally the
+     * shape itself; for siding variants it is the upright-agnostic original.
+     */
+    public EnumShape roofBase = this;
+    /** Atlas cell to draw in the sawbench menu. */
+    public int iconId;
+    /** Orientation written into item stacks, so the item renders like the placed shape. */
+    public int defaultSide;
+    public int defaultTurn;
 
 //	Shape(int id, String title, ShapeKind kind, ShapeSymmetry sym, int used, int made, int occ) {
 //		this(id, title, kind, sym, used, made, occ, null);
@@ -208,6 +256,7 @@ public enum EnumShape {
 
     EnumShape(int id, String translationKey, ShapeKind kind, EnumShapeSymmetry sym, int used, int made, int occ, int flags) {
         this.id = id;
+        this.iconId = id;
         this.translationKey = translationKey;
         this.kind = kind;
         this.symmetry = sym;
@@ -257,32 +306,44 @@ public enum EnumShape {
 
     public void orientOnPlacement(EntityPlayer player, TileShape shape,
                                   BlockPos neighbourPos, IBlockState neighbourState, TileEntity neighbourTile, EnumFacing face, Vector3 hit) {
-        if (!shape.getShape().kind.orientOnPlacement(player, shape, neighbourPos, neighbourState, neighbourTile, face, hit)) {
+        if (this.isSiding() || !shape.getShape().kind.orientOnPlacement(player, shape, neighbourPos, neighbourState, neighbourTile, face, hit)) {
             this.orientFromHitPosition(player, shape, face, hit);
         }
     }
 
     protected void orientFromHitPosition(EntityPlayer player, TileShape shape, EnumFacing face, Vector3 hit) {
         int side, turn;
-        switch (face) {
-            case UP:
-                side = this.rightSideUpSide();
-                break;
-            case DOWN:
-                if (shape.getShape().kind.canPlaceUpsideDown())
-                    side = this.upsideDownSide();
-                else
+        if (this.isSiding()) {
+            // Siding always stands upright: on a wall its face points out of
+            // the wall, on the floor or ceiling towards the player.
+            if (face.getAxis().isHorizontal())
+                side = face.getOpposite().ordinal();
+            else
+                side = sideForUpDirection(player.getHorizontalFacing().getOpposite());
+        } else {
+            switch (face) {
+                case UP:
                     side = this.rightSideUpSide();
-                break;
-            default:
-                if (player.isSneaking())
-                    side = face.getOpposite().ordinal();
-                else if (hit.y > 0.0 && shape.getShape().kind.canPlaceUpsideDown())
-                    side = this.upsideDownSide();
-                else
-                    side = this.rightSideUpSide();
+                    break;
+                case DOWN:
+                    if (shape.getShape().kind.canPlaceUpsideDown())
+                        side = this.upsideDownSide();
+                    else
+                        side = this.rightSideUpSide();
+                    break;
+                default:
+                    if (player.isSneaking())
+                        side = face.getOpposite().ordinal();
+                    else if (hit.y > 0.0 && shape.getShape().kind.canPlaceUpsideDown())
+                        side = this.upsideDownSide();
+                    else
+                        side = this.rightSideUpSide();
+            }
         }
-        turn = turnForPlacementHit(side, hit, this.symmetry);
+        // Siding is mounted flat against the wall: the quarter turn is what
+        // brings the slanted face round to the front, so it is fixed rather
+        // than taken from the hit point.
+        turn = this.isSiding() ? 3 : turnForPlacementHit(side, hit, this.symmetry);
         if (debugPlacement && !shape.getWorld().isRemote) {
             ArchitectureLog.info("Shape.orientFromHitPosition: face {} global hit {}", face, hit);
             ArchitectureLog.info("Shape.orientFromHitPosition: side {} turn {} symmetry {}", side, turn, shape.getShape().symmetry);
@@ -336,5 +397,35 @@ public enum EnumShape {
 
     public boolean isGlow() {
         return (this.flags & GLOW) != 0;
+    }
+
+    public boolean isSiding() {
+        return (this.flags & SIDING) != 0;
+    }
+
+    /** The roofing shape whose geometry and profiles this shape uses. */
+    public EnumShape getRoofBase() {
+        return this.roofBase;
+    }
+
+    /**
+     * Side index that makes the shape's local +Y point along {@code dir}.
+     * The side index space is not the EnumFacing ordinal space.
+     */
+    protected static int sideForUpDirection(EnumFacing dir) {
+        switch (dir) {
+            case SOUTH:
+                return 2;
+            case NORTH:
+                return 3;
+            case EAST:
+                return 4;
+            case WEST:
+                return 5;
+            case DOWN:
+                return 1;
+            default:
+                return 0;
+        }
     }
 }

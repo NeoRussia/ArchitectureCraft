@@ -26,6 +26,7 @@ package com.elytradev.architecture.client.render.shape;
 
 import com.elytradev.architecture.client.render.ICustomRenderer;
 import com.elytradev.architecture.client.render.target.RenderTargetBase;
+import com.elytradev.architecture.client.render.target.RenderTargetWorld;
 import com.elytradev.architecture.client.render.texture.ITexture;
 import com.elytradev.architecture.client.render.texture.TextureBase;
 import com.elytradev.architecture.common.ArchitectureLog;
@@ -40,11 +41,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Set;
 
 public class ShapeRenderDispatch implements ICustomRenderer {
 
@@ -85,7 +88,16 @@ public class ShapeRenderDispatch implements ICustomRenderer {
         int secondaryColour = secondaryStack != null ?
                 itemColors.colorMultiplier(secondaryStack, 0) : baseColour;
 
-        this.renderShapeTE(te, target, t,
+        // Apply the orientation the item will get when placed, so siding
+        // stacks preview upright instead of lying flat like roofing. The item
+        // transform also carries a half turn for the north-facing item
+        // convention; siding is authored with its long face at +Z, so undo it
+        // and let that face look at the player.
+        Trans3 base = te.getShape() != null && te.getShape().isSiding() ? t.turn(2) : t;
+        if (te.getShape() != null)
+            base = base.turn(te.getShape().kind.itemTurnOffset());
+        Trans3 transform = base.t(Trans3.sideTurn(te.getSide(), te.getTurn()));
+        this.renderShapeTE(te, target, transform,
                 te.hasBaseBlockState(),
                 te.hasSecondaryBlockState(),
                 baseColour, secondaryColour);
@@ -113,14 +125,18 @@ public class ShapeRenderDispatch implements ICustomRenderer {
                 TextureAtlasSprite secondarySprite = Utils.getSpriteForBlockState(te.getSecondaryBlockState());
                 if (baseSprite != null) {
                     ITexture[] textures = new ITexture[4];
+                    // Siding is mounted on its side, so a projection aligned to the
+                    // world axes would lay the texture across the wall. Keep the
+                    // model's own UVs there so the grain follows the shape.
+                    boolean projected = !te.getShape().isSiding();
                     if (renderBase) {
                         textures[0] = TextureBase.fromSprite(baseSprite);
-                        textures[1] = textures[0].projected();
+                        textures[1] = projected ? textures[0].projected() : textures[0];
                     }
                     if (renderSecondary) {
                         if (secondarySprite != null) {
                             textures[2] = TextureBase.fromSprite(secondarySprite);
-                            textures[3] = textures[2].projected();
+                            textures[3] = projected ? textures[2].projected() : textures[2];
                         } else
                             renderSecondary = false;
                     }
@@ -131,6 +147,25 @@ public class ShapeRenderDispatch implements ICustomRenderer {
                             textures[3] = textures[1];
                             renderSecondary = renderBase;
                         }
+                    }
+                    // The world target drops faces buried between two blocks,
+                    // and its neighbour is often a different shape, so give it
+                    // a way to look at the neighbour's actual geometry.
+                    if (target instanceof RenderTargetWorld) {
+                        final ITexture[] probeTextures = textures;
+                        final boolean probeBase = renderBase;
+                        final boolean probeSecondary = renderSecondary;
+                        final int probeBaseColour = baseColour;
+                        final int probeSecondaryColour = secondaryColour;
+                        ((RenderTargetWorld) target).setNeighbourGeometry(
+                                new RenderTargetWorld.NeighbourGeometry() {
+                                    @Override
+                                    public Set<Long> cornersOn(TileShape neighbour, EnumFacing boundary) {
+                                        return ShapeProbe.probe(neighbour, probeTextures,
+                                                probeBase, probeSecondary,
+                                                probeBaseColour, probeSecondaryColour).cornersOn(boundary);
+                                    }
+                                });
                     }
                     te.getShape().kind.renderShape(te, textures, target, t,
                             renderBase, renderSecondary,

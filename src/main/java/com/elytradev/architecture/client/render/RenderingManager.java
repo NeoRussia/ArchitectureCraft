@@ -41,7 +41,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -64,12 +63,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_SMOOTH;
 
 public class RenderingManager {
 
     protected static Trans3 itemTrans = Trans3.blockCenterSideTurn(0, 2);
-    protected static String[] texturePrefixes = {"blocks/", "textures/"};
+    protected static String[] texturePrefixes = {"blocks/", "items/"};
     protected Map<Block, ICustomRenderer> blockRenderers = new HashMap<Block, ICustomRenderer>();
     protected Map<Item, ICustomRenderer> itemRenderers = new HashMap<Item, ICustomRenderer>();
     protected Map<IBlockState, ICustomRenderer> stateRendererCache = new HashMap<IBlockState, ICustomRenderer>();
@@ -375,11 +373,9 @@ public class RenderingManager {
                     rend = RenderingManager.this.getCustomRendererForState(block.getDefaultState());
             }
             if (rend != null) {
-                try {
-                    GlStateManager.shadeModel(GL_SMOOTH);
-                } catch (RuntimeException e) {
-                    ArchitectureLog.warn("Failed to enable smooth shading for item models, {}", e.getMessage());
-                }
+                // No GL calls here: item models can be baked on a worker thread
+                // (CCRenderItem, chunk render executors), where there is no
+                // current context and LWJGL3 aborts the JVM.
                 RenderTargetBaked target = new RenderTargetBaked();
                 rend.renderItemStack(stack, target, itemTrans);
                 return target.getBakedModel();

@@ -13,9 +13,11 @@ import com.elytradev.architecture.common.helpers.Vector3;
 import com.elytradev.architecture.common.shape.ItemShape;
 import com.elytradev.architecture.common.tile.TileShape;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -47,7 +49,7 @@ public class PreviewRenderer {
                 BlockPos pos = hit.getBlockPos().offset(hit.sideHit);
                 Tessellator tess = Tessellator.getInstance();
                 BufferBuilder buff = tess.getBuffer();
-                RenderTargetWorld target = new RenderTargetWorld(world, pos, buff, null);
+                RenderTargetWorld target = new RenderTargetWorld(world, pos, buff, null, true);
                 ShapeRenderDispatch shapeDispatcher = ClientProxy.SHAPE_RENDER_DISPATCHER;
                 BlockShape blockShape = ArchitectureMod.CONTENT.blockShape;
                 BlockArchitecture.IOrientationHandler oh = blockShape.getOrientationHandler();
@@ -63,18 +65,30 @@ public class PreviewRenderer {
                 double tY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double) e.getPartialTicks();
                 double tZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double) e.getPartialTicks();
 
+                // The event fires after renderEntities() has changed the bound
+                // texture and disabled the lightmap. Restore both, otherwise the
+                // preview samples whatever texture was left bound and some
+                // materials sample transparent pixels of it, so no ghost appears.
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                mc.entityRenderer.enableLightmap();
+
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(-tX, -tY, -tZ);
                 GlStateManager.depthMask(false);
                 GlStateManager.enableCull();
+                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
                 GlStateManager.enableBlend();
                 GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
                 buff.begin(7, DefaultVertexFormats.ITEM);
                 shapeDispatcher.renderShapeTE(shape, target, t, true, false, Utils.getColourFromState(shape.getBaseBlockState()), -1);
+                target.end();
                 tess.draw();
                 GlStateManager.depthMask(true);
                 GlStateManager.disableBlend();
                 GlStateManager.popMatrix();
+
+                mc.entityRenderer.disableLightmap();
             }
         }
     }

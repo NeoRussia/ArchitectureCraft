@@ -29,6 +29,7 @@ import com.elytradev.architecture.common.helpers.Utils;
 import com.elytradev.architecture.common.helpers.Vector3;
 import com.elytradev.architecture.common.item.ItemCladding;
 import com.elytradev.architecture.common.shape.EnumShape;
+import com.elytradev.architecture.common.shape.ShapeKind;
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -40,6 +41,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -53,6 +55,8 @@ public class TileShape extends TileArchitecture {
     private IBlockState secondaryBlockState;
     private byte offsetX;
     private int disabledConnections;
+    /** Cached light opacity, -1 until computed. Not persisted. */
+    private transient int lightOpacity = -1;
 
     public TileShape() {
         super();
@@ -107,6 +111,7 @@ public class TileShape extends TileArchitecture {
     }
 
     public void setConnectionEnabledGlobal(EnumFacing dir, boolean state) {
+        this.lightOpacity = -1;
         int bit = 1 << dir.ordinal();
         if (state)
             this.disabledConnections &= ~bit;
@@ -135,9 +140,17 @@ public class TileShape extends TileArchitecture {
     @Override
     public void readFromItemStackNBT(NBTTagCompound nbt) {
         this.readShapeFromNBT(nbt);
+        // Item stacks do not store an orientation; use the shape's own
+        // defaults so an item renders the way it will be placed. Siding
+        // defaults to upright, everything else to the old flat pose.
+        if (this.shape != null) {
+            this.setSide(this.shape.defaultSide);
+            this.setTurn(this.shape.defaultTurn);
+        }
     }
 
     protected void readShapeFromNBT(NBTTagCompound nbt) {
+        this.lightOpacity = -1;
         this.shape = EnumShape.forId(nbt.getInteger("Shape"));
         this.baseBlockState = this.nbtGetBlockState(nbt, "BaseName", "BaseData");
         if (this.baseBlockState.getBlock() == Blocks.AIR.getDefaultState())
@@ -283,6 +296,43 @@ public class TileShape extends TileArchitecture {
 
     public EnumShape getShape() {
         return this.shape;
+    }
+
+    public void invalidateLightOpacity() {
+        this.lightOpacity = -1;
+    }
+
+    /**
+     * Light lost entering this block: full-block hulls stop it (15), slab-like
+     * hulls dim it (4), thin ones let it through (0). Cached per tile entity
+     * and invalidated when the shape or its connections change.
+     */
+    public int getLightOpacity() {
+        if (this.lightOpacity < 0)
+            this.lightOpacity = this.computeLightOpacity();
+        return this.lightOpacity;
+    }
+
+    private int computeLightOpacity() {
+        if (this.shape == null || this.shape.kind.getLightOpacity() == 0)
+            return 0;
+        if (this.shape.kind instanceof ShapeKind.Model) {
+            // Model shapes know their filled volume; only a true full cube
+            // gets the opaque tier, everything else only dims.
+            double volume = ((ShapeKind.Model) this.shape.kind).getFilledVolume();
+            if (volume >= 0.99)
+                return 15;
+            return volume >= 0.25 ? 4 : 0;
+        }
+        // Partial kinds (roofs, walls, fences) never block the whole cell.
+        if (this.world == null || this.pos == null)
+            return 4;
+        AxisAlignedBB box = this.shape.kind.getBounds(this, this.world, this.pos,
+                this.world.getBlockState(this.pos), null, Trans3.ident);
+        if (box == null)
+            return 4;
+        double volume = (box.maxX - box.minX) * (box.maxY - box.minY) * (box.maxZ - box.minZ);
+        return volume >= 0.25 ? 4 : 0;
     }
 
     public IBlockState getBaseBlockState() {
