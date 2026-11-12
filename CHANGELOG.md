@@ -1,5 +1,32 @@
 # Changelog
 
+## 3.108-0.2
+
+- Fence picking now matches vanilla: the selection and pick box is the post
+  plus 4 px arms one block tall (`BlockFence.getBoundingBox`), while entity
+  collision keeps the post and the full-width arms at 1.5 blocks. The arms are
+  outlined when hovered and the fence still cannot be jumped.
+- `BlockArchitecture.collisionRayTrace` now asks `getCollisionBoundingBox` for
+  one box, as `Block.collisionRayTrace` does, instead of testing the collision
+  list, so picking and physics are independent again.
+- Fences report `PathNodeType.FENCE`, other solid shapes `BLOCKED`, and slabs,
+  stairs and the roof family stay walkable, so mobs path around a fence
+  instead of walking into it.
+- Shapes take their step, break and hit sounds from the material they were cut
+  from; a wooden fence no longer sounds like stone.
+- Paneling and the GregTech plaque lie flat on a floor or ceiling click, with
+  the cladding or pattern facing the room and the piece's top pointing away
+  from the player. Wall placement is unchanged.
+- The GregTech plaque now faces out of every wall. The north case returned the
+  west turn, so a plaque on a north wall came out sideways.
+- Double Siding turns its clad half towards the player on placement, using the
+  clicked face on a wall and the player's facing on floor and ceiling.
+- Double Roof Tile placement follows three rules: a tile placed against another
+  copies its orientation, a floor or ceiling click turns it to face the player,
+  and a wall click keeps the click-point diagonal. The tile is now a full cube
+  for collision and side solidity, so torches, levers, rails and buttons attach
+  to all six faces and nothing falls into its north edge.
+
 ## 3.108-0.1
 
 - Rebuilt both sawbench menu icon atlases from the shapes' own geometry: one

@@ -34,7 +34,8 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * A thin plaque carrying a pixel pattern, mounted flat on the face you click
- * with its patterned side facing out of the wall.
+ * with its patterned side out. On the floor or ceiling it lies flat, pattern
+ * up or down, with its top pointing away from the player.
  */
 public class Logo extends ShapeKind.Model {
 
@@ -50,11 +51,19 @@ public class Logo extends ShapeKind.Model {
                                      TileEntity neighbourTile,
                                      EnumFacing otherFace,
                                      Vector3 hit) {
-        EnumFacing out = otherFace.getAxis().isHorizontal()
-                ? otherFace
-                : player.getHorizontalFacing().getOpposite();
-        shape.setSide(0);
-        shape.setTurn(turnForDirection(out));
+        if (otherFace.getAxis().isHorizontal()) {
+            // On a wall: local +Z is the patterned side, so it faces out of
+            // the clicked face, into the room.
+            shape.setSide(0);
+            shape.setTurn(turnForDirection(otherFace));
+        } else {
+            // On the floor or a ceiling it lies flat. Local +Z is the
+            // patterned side, so it points up for a floor click and down for a
+            // ceiling click. Local +Y is the top of the pattern and is kept
+            // pointing away from the player.
+            shape.setSide(EnumShape.sideForUpDirection(player.getHorizontalFacing()));
+            shape.setTurn(otherFace == EnumFacing.UP ? 2 : 0);
+        }
         shape.setOffsetX(0);
         return true;
     }
@@ -76,10 +85,7 @@ public class Logo extends ShapeKind.Model {
             case EAST:
                 return 1;
             case NORTH:
-                // The item transform already turns the piece half round, so three
-        // quarters here put the patterned face toward the player, the same way
-        // the sawbench icon shows it.
-        return 3;
+                return 2;
             case WEST:
                 return 3;
             default:

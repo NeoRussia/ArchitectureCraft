@@ -176,7 +176,7 @@ public enum EnumShape {
     SQUARE_SE(113, "architecturecraft.shape.square_se", ShapeKind.Model("square"), QUADRILATERAL, 1, 1, 0xff, GLOW),
     SLAB_SE(114, "architecturecraft.shape.slab_se", ShapeKind.Model("slab"), QUADRILATERAL, 1, 2, 0x0f, GLOW),
     ANGLED_ROOF_RIDGE(115, "architecturecraft.shape.angled_roof_ridge", ShapeKind.Model("angled_roof_ridge"), BILATERAL, 1, 4, 0x0f),
-    DOUBLE_ROOF_TILE(116, "architecturecraft.shape.double_roof_tile", ShapeKind.Model("double_roof_tile"), BILATERAL, 1, 2, 0xcf),
+    DOUBLE_ROOF_TILE(116, "architecturecraft.shape.double_roof_tile", new DoubleRoofTile(), BILATERAL, 1, 2, 0xff),
 
     // Clean-room wall inspired by Industrial Renewal's wall_concrete.
     WALL(117, "architecturecraft.shape.wall", new Wall(), QUADRILATERAL, 1, 2, 0x0),
@@ -196,7 +196,7 @@ public enum EnumShape {
     SLOPE_TILE_C4_SIDING(128, "architecturecraft.shape.slope_tile_c4_siding", ShapeKind.Roof, BILATERAL, 1, 4, 0x0f, SIDING),
 
     PANELING(129, "architecturecraft.shape.paneling", new Paneling(), QUADRILATERAL, 1, 4, 0x0),
-    DOUBLE_SIDING(130, "architecturecraft.shape.double_siding", ShapeKind.Model("double_siding"), QUADRILATERAL, 1, 1, 0xff),
+    DOUBLE_SIDING(130, "architecturecraft.shape.double_siding", new DoubleSiding(), QUADRILATERAL, 1, 1, 0xff),
     GREG_TECH(131, "architecturecraft.shape.greg_tech", new Logo(), QUADRILATERAL, 1, 1, 0x0),
     ;
 
@@ -406,6 +406,24 @@ public enum EnumShape {
     /** The roofing shape whose geometry and profiles this shape uses. */
     public EnumShape getRoofBase() {
         return this.roofBase;
+    }
+
+    /**
+     * True for shapes a mob is meant to walk on: slabs, stairs and the roof
+     * family. Everything else is an obstacle as far as pathfinding goes, even
+     * though most of them are not full cubes and would otherwise look walkable.
+     */
+    public boolean isWalkableSurface() {
+        switch (this) {
+            case SLAB:
+            case SLAB_SE:
+            case STAIRS:
+            case STAIRS_OUTER_CORNER:
+            case STAIRS_INNER_CORNER:
+                return true;
+            default:
+                return this.kind instanceof ShapeKind.Roof;
+        }
     }
 
     /**

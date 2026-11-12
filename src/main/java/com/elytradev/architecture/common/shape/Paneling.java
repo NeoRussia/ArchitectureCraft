@@ -33,12 +33,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * A thin vertical panel on one face of the block, 3/16 thick and flush with
- * the block boundary, with a cladding layer on the room-facing side.
+ * A thin panel, 3/16 thick and flush with the block boundary, with a cladding
+ * layer on the room-facing side.
  *
  * <p>The model's local +Z is the wall side, so placement only needs a turn:
  * on a wall the panel backs onto the clicked face; on the floor or ceiling it
- * stands upright facing the player.</p>
+ * lies flat, cladding up or down, with its top pointing away from the
+ * player.</p>
  */
 public class Paneling extends ShapeKind.Model {
 
@@ -54,11 +55,19 @@ public class Paneling extends ShapeKind.Model {
                                      TileEntity neighbourTile,
                                      EnumFacing otherFace,
                                      Vector3 hit) {
-        EnumFacing wall = otherFace.getAxis().isHorizontal()
-                ? otherFace.getOpposite()
-                : player.getHorizontalFacing();
-        shape.setSide(0);
-        shape.setTurn(turnForWallDirection(wall));
+        if (otherFace.getAxis().isHorizontal()) {
+            // On a wall the panel backs onto the clicked face: local +Z is the
+            // wall side, so the turn maps it to the face touching the wall.
+            shape.setSide(0);
+            shape.setTurn(turnForWallDirection(otherFace.getOpposite()));
+        } else {
+            // On the floor or a ceiling it lies flat. Local +Z is the wall
+            // side, so it points into the floor or the ceiling, which leaves
+            // the cladding facing the room. Local +Y is the top of the panel
+            // and is kept pointing away from the player.
+            shape.setSide(EnumShape.sideForUpDirection(player.getHorizontalFacing()));
+            shape.setTurn(otherFace == EnumFacing.UP ? 0 : 2);
+        }
         shape.setOffsetX(0);
         return true;
     }

@@ -34,6 +34,7 @@ import com.elytradev.architecture.common.helpers.Vector3;
 import com.elytradev.architecture.common.tile.TileShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -106,32 +107,46 @@ public class Fence extends ConnectedShape {
                                         Entity entity,
                                         Trans3 t,
                                         List list) {
-        // Vanilla fence collision: a 4x16x4 post, plus a 2-wide rail wall for
-        // every connection, all 1.5 blocks tall so the fence cannot be jumped.
+        // Entity collision only: post and arms, 1.5 blocks tall, as vanilla's
+        // BlockFence.addCollisionBoxToList. Picking never uses these boxes.
         this.addBox(new Vector3(-0.125, -0.5, -0.125),
                 new Vector3(0.125, 1.0, 0.125), t, list);
         if (isConnected(te, EnumFacing.NORTH))
-            this.addBox(new Vector3(-0.0625, -0.5, -0.5),
-                    new Vector3(0.0625, 1.0, 0.125), t, list);
-        if (isConnected(te, EnumFacing.EAST))
-            this.addBox(new Vector3(-0.125, -0.5, -0.0625),
-                    new Vector3(0.5, 1.0, 0.0625), t, list);
+            this.addBox(new Vector3(-0.125, -0.5, -0.5),
+                    new Vector3(0.125, 1.0, 0.0), t, list);
         if (isConnected(te, EnumFacing.SOUTH))
-            this.addBox(new Vector3(-0.0625, -0.5, -0.125),
-                    new Vector3(0.0625, 1.0, 0.5), t, list);
+            this.addBox(new Vector3(-0.125, -0.5, 0.0),
+                    new Vector3(0.125, 1.0, 0.5), t, list);
         if (isConnected(te, EnumFacing.WEST))
-            this.addBox(new Vector3(-0.5, -0.5, -0.0625),
-                    new Vector3(0.125, 1.0, 0.0625), t, list);
+            this.addBox(new Vector3(-0.5, -0.5, -0.125),
+                    new Vector3(0.0, 1.0, 0.125), t, list);
+        if (isConnected(te, EnumFacing.EAST))
+            this.addBox(new Vector3(0.0, -0.5, -0.125),
+                    new Vector3(0.5, 1.0, 0.125), t, list);
     }
 
     @Override
     public AxisAlignedBB getBounds(TileShape te, IBlockAccess world, BlockPos pos, IBlockState state,
                                    Entity entity, Trans3 t) {
-        // Vanilla uses the post as the selection box, not the rails or the
-        // 1.5-high collision boxes.
+        // Selection and picking box: post and arms, one block tall, 4 px wide
+        // bars that run from the post to the block edge. This is vanilla's
+        // BlockFence.getBoundingBox, which Block.collisionRayTrace uses; the
+        // 1.5 collision above is for entity movement only.
         List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
         this.addBox(new Vector3(-0.125, -0.5, -0.125),
                 new Vector3(0.125, 0.5, 0.125), t, list);
+        if (isConnected(te, EnumFacing.NORTH))
+            this.addBox(new Vector3(-0.125, -0.5, -0.5),
+                    new Vector3(0.125, 0.5, 0.0), t, list);
+        if (isConnected(te, EnumFacing.SOUTH))
+            this.addBox(new Vector3(-0.125, -0.5, 0.0),
+                    new Vector3(0.125, 0.5, 0.5), t, list);
+        if (isConnected(te, EnumFacing.WEST))
+            this.addBox(new Vector3(-0.5, -0.5, -0.125),
+                    new Vector3(0.0, 0.5, 0.125), t, list);
+        if (isConnected(te, EnumFacing.EAST))
+            this.addBox(new Vector3(0.0, -0.5, -0.125),
+                    new Vector3(0.5, 0.5, 0.125), t, list);
         return Utils.unionOfBoxes(list);
     }
 
@@ -139,4 +154,11 @@ public class Fence extends ConnectedShape {
     public boolean secondaryDefaultsToBase() {
         return false;
     }
+
+    @Override
+    public PathNodeType getPathNodeType() {
+        return PathNodeType.FENCE;
+    }
+
+
 }

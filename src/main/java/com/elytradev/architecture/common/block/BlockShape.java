@@ -25,11 +25,14 @@
 package com.elytradev.architecture.common.block;
 
 import com.elytradev.architecture.common.helpers.Trans3;
+import com.elytradev.architecture.common.helpers.Utils;
 import com.elytradev.architecture.common.helpers.Vector3;
 import com.elytradev.architecture.common.shape.ConnectedShape;
+import com.elytradev.architecture.common.shape.EnumShape;
 import com.elytradev.architecture.common.tile.TileShape;
 import com.elytradev.architecture.legacy.base.BaseOrientation;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -38,8 +41,10 @@ import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -284,6 +289,37 @@ public class BlockShape extends BlockArchitecture<TileShape> {
             return super.getBoundingBox(state, world, pos);
     }
 
+    /**
+     * Shapes are made of the material they were cut from, so they have to sound
+     * like it too. Without this the block falls back to Block's default, which
+     * is stone for every shape, and a wooden fence walks like rock.
+     */
+    @Override
+    public SoundType getSoundType(IBlockState state, World world, BlockPos pos, @Nullable Entity entity) {
+        TileShape te = this.getTileEntity(world, pos);
+        if (te != null) {
+            IBlockState base = te.getBaseBlockState();
+            if (base != null && base.getBlock() != Blocks.AIR) {
+                SoundType sound = base.getBlock().getSoundType(base, world, pos, entity);
+                if (sound != null)
+                    return sound;
+            }
+        }
+        return super.getSoundType(state, world, pos, entity);
+    }
+
+    @Override
+    public PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos) {
+        TileShape te = this.getTileEntity(world, pos);
+        if (te == null || te.getShape() == null)
+            return null;
+        EnumShape shape = te.getShape();
+        PathNodeType kindType = shape.kind.getPathNodeType();
+        if (kindType != null)
+            return kindType;
+        return shape.isWalkableSurface() ? null : PathNodeType.BLOCKED;
+    }
+
     @Override
     public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos,
                                       AxisAlignedBB clip, List result, Entity entity, boolean b) {
@@ -387,7 +423,8 @@ public class BlockShape extends BlockArchitecture<TileShape> {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player,
+                                     EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.inventory.getCurrentItem();
         if (!stack.isEmpty()) {
             TileShape te = TileShape.get(world, pos);

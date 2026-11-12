@@ -523,31 +523,16 @@ public class BlockArchitecture<TE extends TileArchitecture>
     @Override
     public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
         boxHit = null;
-        RayTraceResult result = null;
-        double nearestDistance = 0;
-        List<AxisAlignedBB> list = getGlobalCollisionBoxes(world, pos, state, null);
-        if (list != null) {
-            int n = list.size();
-            for (int i = 0; i < n; i++) {
-                AxisAlignedBB box = list.get(i);
-                RayTraceResult mp = box.calculateIntercept(start, end);
-                if (mp != null) {
-                    mp.subHit = i;
-                    double d = start.squareDistanceTo(mp.hitVec);
-                    if (result == null || d < nearestDistance) {
-                        result = mp;
-                        nearestDistance = d;
-                    }
-                }
-            }
-        }
-        if (result != null) {
-            //setBlockBounds(list.get(result.subHit));
-            int i = result.subHit;
-            boxHit = list.get(i).offset(-pos.getX(), -pos.getY(), -pos.getZ());
-            result = new RayTraceResult(result.hitVec, result.sideHit, pos);
-            result.subHit = i;
-        }
+        // Same shape of call as vanilla's Block.collisionRayTrace: one box, in
+        // the block's own coordinates, which Block.rayTrace offsets by pos.
+        // The box is the selection box, so a fence is picked at model height
+        // while its collision boxes stay 1.5 for physics.
+        AxisAlignedBB box = this.getCollisionBoundingBox(state, world, pos);
+        if (box == null || box == Block.NULL_AABB)
+            return null;
+        RayTraceResult result = this.rayTrace(pos, start, end, box);
+        if (result != null)
+            boxHit = box;
         return result;
     }
 

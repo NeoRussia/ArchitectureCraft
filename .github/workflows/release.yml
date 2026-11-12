@@ -2,7 +2,7 @@ name: Release
 
 # Builds the mod and attaches both jars to a GitHub release.
 #
-# The tag is the version: push `v3.108-0.1`, or run the workflow by hand with
+# The tag is the version: push `v0.2`, or run the workflow by hand with
 # that tag. The jar name comes from `releaseName` in project.gradle, and the
 # run fails if the tag does not appear in it, so a forgotten version bump is
 # caught here instead of shipping a mislabelled download.
@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release, for example v3.108-0.1'
+        description: 'Tag to release, for example v0.2'
         required: true
 
 permissions:

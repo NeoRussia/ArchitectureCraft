@@ -49,6 +49,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -233,6 +234,17 @@ public abstract class ShapeKind {
     public boolean secondaryDefaultsToBase() {
         return false;
     }
+
+    /**
+     * Path node type reported to the walk pathfinder, or null to keep the
+     * vanilla default. Fences and walls block movement, but they are not full
+     * cubes, so without this the pathfinder treats them as walkable and mobs
+     * keep trying to cross them.
+     */
+    public PathNodeType getPathNodeType() {
+        return null;
+    }
+
 
     //------------------------------------------------------------------------------
 
