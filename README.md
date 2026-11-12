@@ -1,4 +1,4 @@
-# ArchitectureCraft: Reloaded
+# ArchitectureCraft: Renovated
 
 A 1.12.2 continuation of [TridentMC/ArchitectureCraft](https://github.com/TridentMC/ArchitectureCraft).
 More features will follow.
@@ -8,12 +8,12 @@ This is not an official TridentMC release.
 
 *Distinguished architectural features for your Minecraft buildings, restyled for Kyn's sensibilities.*
 
-![ArchitectureCraft: Reloaded](docs/images/reloaded.png)
+![ArchitectureCraft: Renovated](docs/images/renovated.png)
 
 ## Current additions
 
 The shape IDs `94-116` are the same as GTNH's fork, so existing IDs `0-93`
-are untouched; `117` is Reloaded-specific:
+are untouched; `117` is Renovated-specific:
 
 | IDs | Shapes |
 |---|---|
@@ -106,6 +106,7 @@ See [CREDITS.md](CREDITS.md) for the per-contributor asset and code credits.
 
 - Original ArchitectureCraft: Greg Ewing (gcewing), MIT.
 - 1.12 port: TridentMC / darkevilmac / unascribed contributors, MIT.
+- Renovated fork: Neeyo (maintainer), MIT.
 - GTNH shape additions: Sampsa (slopes), Superfrogman98 (angled ridge, double
   roof tile, glow icons), Imgood (glow category), MIT.
 - Double Roof Tile geometry uses the GTNH model; its front/back faces are a

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.108-0.1
 
 - Rebuilt both sawbench menu icon atlases from the shapes' own geometry: one
   render per shape, purple with a smooth shade ramp, cladding parts in yellow
@@ -44,13 +44,9 @@
   does.
 - Added shape ID 131, GregTech: a 2 px plaque carrying the 16x16 GregTech
   logo pattern, mounted on the clicked face.
-- Added the Hash Brown item, a stand-alone easter egg with its own id and
-  assets, separate from the shape, block and fitting items.
 - Fixed siding item icons: item stacks now read the shape's default side and
   turn, and the item transform's half turn is undone so the long face points at
   the player instead of away.
-- The Hash Brown item now has epic rarity and an italic grey tooltip line,
-  "Still warm".
 - Custom block geometry skips its own directional shade while an
   OptiFine/Iris shader pack is active, so shaders light it once instead of
   twice. The API is reached by reflection; no shader mod is required. Vertex
@@ -92,7 +88,7 @@
 
 ## 1.12.2-3.108-reloaded.1
 
-ArchitectureCraft: Reloaded, based on TridentMC 1.12-3.108.
+ArchitectureCraft: Renovated, based on TridentMC 1.12-3.108.
 
 - Added GTNH shapes IDs 94-116: nine 1x2/1x3/1x4 slope pieces, nine glowing
   slope variants, glowing Roof Tile, Square and Slab, Angled Roof Ridge, and

@@ -1,15 +1,17 @@
 [
     {
         "modid": "architecturecraft",
-        "name": "ArchitectureCraft: Reloaded",
+        "name": "ArchitectureCraft: Renovated",
         "description": "A 1.12.2 continuation of ArchitectureCraft with additional shapes and features.",
         "version": "${version}",
-        "logoFile": "assets/examplemod/textures/logo.png",
-        "url": "https://github.com/NeoRussia/architecturecraft-reloaded",
+        "logoFile": "assets/architecturecraft/textures/logo.png",
+        "url": "https://github.com/NeoRussia/ArchitectureCraft-Renovated",
         "authorList": [
-            "gcewing (Original Developer)",
+            "Neeyo (Renovated fork)",
+            "gcewing (original ArchitectureCraft)",
             "darkevilmac (1.12 port)",
-            "Reloaded contributors"
-        ]
+            "Renovated contributors"
+        ],
+        "credits": "Renovated is maintained by Neeyo. Original ArchitectureCraft by Greg Ewing (gcewing); 1.12 port by darkevilmac, unascribed and the TridentMC contributors; additional shapes ported from GTNewHorizons' ArchitectureCraft."
     }
 ]

@@ -315,6 +315,78 @@ public abstract class ShapeKind {
             new RenderRoof(te, textures, t, target, renderBase, renderSecondary, baseColourMult, secondaryColourMult).render();
         }
 
+        /**
+         * Number of collision slices across a slope. 1.12 only collides with
+         * axis-aligned boxes, so an incline has to be a staircase; the old
+         * occlusion mask made that staircase two cubelets tall, which is the
+         * half-block step players felt. Eight slices put each step at 1/8 of a
+         * block, which is below the auto-step height and reads as a walkable
+         * ramp rather than a stair.
+         */
+        private static final int SLOPE_COLLISION_STEPS = 8;
+
+        @Override
+        public void addCollisionBoxesToList(TileShape te, IBlockAccess world, BlockPos pos, IBlockState state,
+                                            Entity entity, Trans3 t, List list) {
+            double[] profile = slopeProfile(te.getShape().getRoofBase());
+            if (profile == null) {
+                // Corners, ridges and valleys are not a single incline.
+                super.addCollisionBoxesToList(te, world, pos, state, entity, t, list);
+                return;
+            }
+            for (int i = 0; i < SLOPE_COLLISION_STEPS; i++) {
+                double z0 = -0.5 + (double) i / SLOPE_COLLISION_STEPS;
+                double z1 = -0.5 + (double) (i + 1) / SLOPE_COLLISION_STEPS;
+                // Heights run from `profile[1]` at the low edge to `profile[0]`
+                // at the high one; take the far edge of the slice so the boxes
+                // never sit below the visible slope.
+                double h = profile[1] + (profile[0] - profile[1]) * (z1 + 0.5);
+                this.addBox(new Vector3(-0.5, -0.5, z0), new Vector3(0.5, h - 0.5, z1), t, list);
+            }
+        }
+
+        /**
+         * Height of a straight slope at z = 1 and z = 0 in shape space, matching
+         * the values RenderRoof passes to renderVariableSlope. Null for roofs
+         * that are not one incline.
+         */
+        private static double[] slopeProfile(EnumShape base) {
+            switch (base) {
+                case ROOF_TILE:
+                case ROOF_TILE_SE:
+                    return new double[]{1.0, 0.0};
+                case SLOPE_TILE_A1:
+                case SLOPE_TILE_A1_SE:
+                    return new double[]{1.0, 0.5};
+                case SLOPE_TILE_A2:
+                case SLOPE_TILE_A2_SE:
+                    return new double[]{0.5, 0.0};
+                case SLOPE_TILE_B1:
+                case SLOPE_TILE_B1_SE:
+                    return new double[]{1.0, 2.0 / 3.0};
+                case SLOPE_TILE_B2:
+                case SLOPE_TILE_B2_SE:
+                    return new double[]{2.0 / 3.0, 1.0 / 3.0};
+                case SLOPE_TILE_B3:
+                case SLOPE_TILE_B3_SE:
+                    return new double[]{1.0 / 3.0, 0.0};
+                case SLOPE_TILE_C1:
+                case SLOPE_TILE_C1_SE:
+                    return new double[]{1.0, 0.75};
+                case SLOPE_TILE_C2:
+                case SLOPE_TILE_C2_SE:
+                    return new double[]{0.75, 0.5};
+                case SLOPE_TILE_C3:
+                case SLOPE_TILE_C3_SE:
+                    return new double[]{0.5, 0.25};
+                case SLOPE_TILE_C4:
+                case SLOPE_TILE_C4_SE:
+                    return new double[]{0.25, 0.0};
+                default:
+                    return null;
+            }
+        }
+
         @Override
         public Object profileForLocalFace(EnumShape shape, EnumFacing face) {
             switch (shape.getRoofBase()) {

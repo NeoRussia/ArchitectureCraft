@@ -1,8 +1,13 @@
 # Credits
 
-ArchitectureCraft: Reloaded is a 1.12.2 continuation of
+ArchitectureCraft: Renovated is a 1.12.2 continuation of
 TridentMC/ArchitectureCraft with shapes ported from
 GTNewHorizons/ArchitectureCraft.
+
+## Renovated fork
+
+- **Neeyo** - maintainer of ArchitectureCraft: Renovated: the additional shape
+  families, the sawbench menu work and the release packaging.
 
 ## Original ArchitectureCraft
 
@@ -30,7 +35,7 @@ at tag `1.12.19`.
 The common shapes and models not added by GTNH remain the work of gcewing and
 the TridentMC/1.12 contributors.
 
-## Reloaded additions
+## Renovated additions
 
 - **Wall (shape ID 117)** — new code, models and menu icon written for this
   fork. The connection behaviour is modelled on Industrial Renewal's concrete
