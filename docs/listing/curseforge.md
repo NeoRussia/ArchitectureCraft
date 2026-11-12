@@ -62,16 +62,16 @@ contributors; shapes 94-116 and several menu assets from GTNewHorizons' fork.
 See CREDITS.md in the repository. Not an official TridentMC release.</p>
 ```
 
-## File 0.2
+## File 0.3
 
 | Field | Value |
 |---|---|
-| Upload | architecturecraft-renovated.3.108-0.2.jar |
-| Display name | 0.2 |
+| Upload | architecturecraft-renovated.3.108-0.3.jar |
+| Display name | 0.3 |
 | Release type | Release |
 | Supported version | 1.12.2 |
 | Loader | Forge |
-| Changelog | the `3.108-0.2` section of CHANGELOG.md |
+| Changelog | the `3.108-0.3` section of CHANGELOG.md |
 
 The sources jar is not a separate CurseForge file; keep it on the GitHub
 release, or add it as an extra file on the same version if you want it there.

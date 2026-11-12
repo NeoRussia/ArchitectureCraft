@@ -61,17 +61,17 @@ into `mods/`.
 shapes 94-116 and several menu assets from GTNewHorizons' fork. See CREDITS.md
 in the repository. Not an official TridentMC release.
 
-## Version 0.2
+## Version 0.3
 
 | Field | Value |
 |---|---|
-| File | architecturecraft-renovated.3.108-0.2.jar |
-| Additional file | architecturecraft-renovated.3.108-0.2-sources.jar |
-| Version number | 0.2 |
+| File | architecturecraft-renovated.3.108-0.3.jar |
+| Additional file | architecturecraft-renovated.3.108-0.3-sources.jar |
+| Version number | 0.3 |
 | Channel | release |
 | Game versions | 1.12.2 |
 | Loader | Forge |
-| Changelog | the `3.108-0.2` section of CHANGELOG.md |
+| Changelog | the `3.108-0.3` section of CHANGELOG.md |
 
 ## Note on the AI disclosure
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.108-0.3
+
+- Siding placement answers the mouse: on a wall the half of the face you click
+  decides which way the bevel runs, so both left/right orientations are
+  reachable at placement. Holding shift takes the slope's own quadrant rule
+  instead, adding the up/down pair, and a siding placed against another shape
+  now follows its orientation like a slope does; shift disables that follow.
+- Double Siding copies the orientation of a neighbouring Double Siding, so a
+  run stays consistent; otherwise the clad half still turns towards the
+  player. Shift skips the copy.
+- Double Roof Tile: shift skips the neighbour copy, matching Double Siding and
+  the ordinary shapes.
+
 ## 3.108-0.2
 
 - Fence picking now matches vanilla: the selection and pick box is the post
