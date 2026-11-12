@@ -88,13 +88,27 @@ jobs:
           sha256sum *.jar > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
+      # The curated body lives in the repo, one file per tag, so a release never
+      # ships with only GitHub's auto-generated commit list. Missing notes fail
+      # the run the same way a forgotten version bump does.
+      - name: Check the release notes exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes="docs/releases/${TAG}.md"
+          if [ ! -f "$notes" ]; then
+            echo "::error::missing $notes; write the release notes and commit them before tagging $TAG"
+            exit 1
+          fi
+          echo "release notes: $notes"
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ steps.jar.outputs.name }}
+          body_path: docs/releases/${{ env.TAG }}.md
           files: |
             build/libs/*.jar
             build/libs/SHA256SUMS.txt
           fail_on_unmatched_files: true
-          generate_release_notes: true
