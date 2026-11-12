@@ -36,8 +36,10 @@ import net.minecraft.util.math.BlockPos;
  * A block clad on one half: the model's local -X half carries the cladding,
  * the +X half the base material.
  *
- * <p>Placement keeps the block upright and turns the clad half towards the
- * player, so the material you asked for is the one you see.</p>
+ * <p>Placement follows two rules in order: a block placed against another one
+ * copies its orientation, so runs stay consistent; otherwise the block stays
+ * upright and turns its clad half towards the player, so the material you
+ * asked for is the one you see.</p>
  */
 public class DoubleSiding extends ShapeKind.Model {
 
@@ -53,8 +55,22 @@ public class DoubleSiding extends ShapeKind.Model {
                                      TileEntity neighbourTile,
                                      EnumFacing otherFace,
                                      Vector3 hit) {
-        // On a wall the clicked face is the one facing the player; on the
-        // floor or ceiling the player's own facing gives it.
+        if (!player.isSneaking() && neighbourTile instanceof TileShape) {
+            // Continue a run: the model declares no profiles, so the generic
+            // match cannot join two of these; copying the neighbour does.
+            // Sneaking skips it, as it does for the profile match on ordinary
+            // shapes, leaving the player-facing rule below.
+            TileShape neighbour = (TileShape) neighbourTile;
+            if (neighbour.getShape() != null && neighbour.getShape().kind == this) {
+                shape.setSide(neighbour.getSide());
+                shape.setTurn(neighbour.getTurn());
+                shape.setOffsetX(neighbour.getOffsetX());
+                return true;
+            }
+        }
+        // Otherwise the clad half faces the player: on a wall the clicked face
+        // is the one facing them, on the floor or ceiling it is the opposite
+        // of their own facing.
         EnumFacing out = otherFace.getAxis().isHorizontal()
                 ? otherFace
                 : player.getHorizontalFacing().getOpposite();

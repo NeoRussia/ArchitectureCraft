@@ -56,9 +56,10 @@ public class DoubleRoofTile extends ShapeKind.Model {
                                      TileEntity neighbourTile,
                                      EnumFacing otherFace,
                                      Vector3 hit) {
-        if (neighbourTile instanceof TileShape) {
+        if (!player.isSneaking() && neighbourTile instanceof TileShape) {
             // The model declares no profiles, so the generic profile match
-            // can never join two tiles; copying the neighbour does.
+            // can never join two tiles; copying the neighbour does. Sneaking
+            // skips it, as it does for the profile match on ordinary shapes.
             TileShape neighbour = (TileShape) neighbourTile;
             if (neighbour.getShape() != null && neighbour.getShape().kind == this) {
                 shape.setSide(neighbour.getSide());

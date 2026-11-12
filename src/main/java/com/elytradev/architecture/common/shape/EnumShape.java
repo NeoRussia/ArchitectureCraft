@@ -306,7 +306,7 @@ public enum EnumShape {
 
     public void orientOnPlacement(EntityPlayer player, TileShape shape,
                                   BlockPos neighbourPos, IBlockState neighbourState, TileEntity neighbourTile, EnumFacing face, Vector3 hit) {
-        if (this.isSiding() || !shape.getShape().kind.orientOnPlacement(player, shape, neighbourPos, neighbourState, neighbourTile, face, hit)) {
+        if (!shape.getShape().kind.orientOnPlacement(player, shape, neighbourPos, neighbourState, neighbourTile, face, hit)) {
             this.orientFromHitPosition(player, shape, face, hit);
         }
     }
@@ -314,12 +314,20 @@ public enum EnumShape {
     protected void orientFromHitPosition(EntityPlayer player, TileShape shape, EnumFacing face, Vector3 hit) {
         int side, turn;
         if (this.isSiding()) {
-            // Siding always stands upright: on a wall its face points out of
-            // the wall, on the floor or ceiling towards the player.
+            // Siding mounts the same way either way: on a wall out of the
+            // clicked face, on the floor or ceiling towards the player.
             if (face.getAxis().isHorizontal())
                 side = face.getOpposite().ordinal();
             else
                 side = sideForUpDirection(player.getHorizontalFacing().getOpposite());
+            if (player.isSneaking())
+                // Shift opens the slope set of four orientations, taken from
+                // the quadrant of the click.
+                turn = turnForPlacementHit(side, hit, this.symmetry);
+            else
+                // Without shift, only the left/right pair, from the half of
+                // the face that was clicked.
+                turn = face.getAxis().isHorizontal() ? sidingTurnForHalf(side, face, hit) : 3;
         } else {
             switch (face) {
                 case UP:
@@ -339,11 +347,8 @@ public enum EnumShape {
                     else
                         side = this.rightSideUpSide();
             }
+            turn = turnForPlacementHit(side, hit, this.symmetry);
         }
-        // Siding is mounted flat against the wall: the quarter turn is what
-        // brings the slanted face round to the front, so it is fixed rather
-        // than taken from the hit point.
-        turn = this.isSiding() ? 3 : turnForPlacementHit(side, hit, this.symmetry);
         if (debugPlacement && !shape.getWorld().isRemote) {
             ArchitectureLog.info("Shape.orientFromHitPosition: face {} global hit {}", face, hit);
             ArchitectureLog.info("Shape.orientFromHitPosition: side {} turn {} symmetry {}", side, turn, shape.getShape().symmetry);
@@ -355,6 +360,28 @@ public enum EnumShape {
             if (debugPlacement && !shape.getWorld().isRemote)
                 ArchitectureLog.info("Shape.orientFromHitPosition: kind = %s offsetX = %.3f\n", this.kind, shape.getOffsetX());
         }
+    }
+
+    /**
+     * Turn for a siding mounted on a wall, from the half of the face that was
+     * clicked. Local +Z is the tile's thick edge, so turning it away from that
+     * half makes the bevel fall towards it. Only the two horizontal turns are
+     * candidates; a click on the centre line keeps the default.
+     */
+    private static int sidingTurnForHalf(int side, EnumFacing face, Vector3 hit) {
+        Vector3 wanted = face.getAxis() == EnumFacing.Axis.Z
+                ? new Vector3(-Math.signum(hit.x), 0, 0)
+                : new Vector3(0, 0, -Math.signum(hit.z));
+        int best = 3;
+        double bestDot = 0.0;
+        for (int turn : new int[]{1, 3}) {
+            double dot = Trans3.sideTurn(side, turn).v(new Vector3(0, 0, 1)).dot(wanted);
+            if (dot > bestDot) {
+                bestDot = dot;
+                best = turn;
+            }
+        }
+        return best;
     }
 
     public double offsetXForPlacementHit(int side, int turn, Vector3 hit) {
