@@ -99,6 +99,7 @@ public class Wedge extends ShapeKind.Model {
                 shape.setSide(neighbour.getSide());
                 shape.setTurn(neighbour.getTurn());
                 shape.setOffsetX(neighbour.getOffsetX());
+                shape.setMirror(neighbour.getMirror());
                 return true;
             }
         }

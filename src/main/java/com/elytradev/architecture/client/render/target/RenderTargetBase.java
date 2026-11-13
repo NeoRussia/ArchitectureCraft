@@ -121,6 +121,11 @@ public abstract class RenderTargetBase {
             throw new IllegalStateException("No normal");
         if (this.texture == null)
             throw new IllegalStateException("No texture");
+        if (this.texture.hasTransform()) {
+            double[] uv = this.texture.transformUV(u, v);
+            u = uv[0];
+            v = uv[1];
+        }
         iu = this.texture.interpolateU(u);
         iv = this.texture.interpolateV(v);
         this.rawAddVertex(p, iu, iv);

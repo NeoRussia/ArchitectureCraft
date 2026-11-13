@@ -140,6 +140,14 @@ public class ShapeRenderDispatch implements ICustomRenderer {
                         } else
                             renderSecondary = false;
                     }
+                    int orient = te.getMirror();
+                    if (orient != 0) {
+                        int rot = orient & 3;
+                        boolean flipped = (orient & 4) != 0;
+                        for (int i = 0; i < 4; i++)
+                            if (textures[i] instanceof TextureBase)
+                                textures[i] = ((TextureBase) textures[i]).transformed(rot, flipped);
+                    }
                     if (renderBase && te.getShape().kind.secondaryDefaultsToBase()) {
                         if (secondarySprite == null || (te.hasSecondaryBlockState() &&
                                 te.getSecondaryBlockState().getBlock().getRenderLayer() != BlockRenderLayer.SOLID)) {

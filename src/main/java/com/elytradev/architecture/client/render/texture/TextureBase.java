@@ -114,6 +114,14 @@ public abstract class TextureBase implements ITexture {
         return result;
     }
 
+    /** Turn or mirror the sampled coordinates, so a flipped piece reads right. */
+    public ITexture transformed(int rot, boolean flip) {
+        Proxy result = new Proxy(this);
+        result.rot = rot & 3;
+        result.flip = flip;
+        return result;
+    }
+
     @Override
     public ITiledTexture tiled(int numRows, int numCols) {
         return new TileSet(this, numRows, numCols);
@@ -144,6 +152,35 @@ public abstract class TextureBase implements ITexture {
         @Override
         public boolean isSolid() {
             return this.base.isSolid();
+        }
+
+        public int rot;
+        public boolean flip;
+
+        @Override
+        public boolean hasTransform() {
+            return this.rot != 0 || this.flip;
+        }
+
+        @Override
+        public double[] transformUV(double u, double v) {
+            if (this.flip)
+                u = 1.0 - u;
+            double t;
+            switch (this.rot & 3) {
+                case 1:
+                    t = u; u = v; v = 1.0 - t;
+                    break;
+                case 2:
+                    u = 1.0 - u; v = 1.0 - v;
+                    break;
+                case 3:
+                    t = u; u = 1.0 - v; v = t;
+                    break;
+                default:
+                    break;
+            }
+            return this.base.transformUV(u, v);
         }
 
         @Override

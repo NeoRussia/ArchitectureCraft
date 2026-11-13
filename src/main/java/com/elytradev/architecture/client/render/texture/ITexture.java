@@ -53,6 +53,16 @@ public interface ITexture {
 
     ITexture projected();
 
+    /** True when the pair transform below does anything; lets callers skip it. */
+    default boolean hasTransform() {
+        return false;
+    }
+
+    /** Texture-space transform, applied to (u, v) as a pair so it can rotate. */
+    default double[] transformUV(double u, double v) {
+        return new double[]{u, v};
+    }
+
     ITexture emissive();
 
     ITiledTexture tiled(int numRows, int numCols);

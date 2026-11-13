@@ -54,6 +54,8 @@ public class TileShape extends TileArchitecture {
     private IBlockState baseBlockState;
     private IBlockState secondaryBlockState;
     private byte offsetX;
+    /** Texture orientation: bits 0-1 are quarter turns, bit 2 mirrors U. */
+    private int mirror;
     private int disabledConnections;
     /** Cached light opacity, -1 until computed. Not persisted. */
     private transient int lightOpacity = -1;
@@ -86,6 +88,42 @@ public class TileShape extends TileArchitecture {
                 return (TileShape) te;
         }
         return null;
+    }
+
+    public int getMirror() {
+        return this.mirror;
+    }
+
+    public void setMirror(int mirror) {
+        // Pure assignment, like setSide/setTurn: placement and the preview call
+        // this every frame, so it must not mark the block or send packets.
+        this.mirror = mirror & 7;
+    }
+
+    public int getTexRot() {
+        return this.mirror & 3;
+    }
+
+    public boolean isTexFlipped() {
+        return (this.mirror & 4) != 0;
+    }
+
+    public void setTexRot(int rot) {
+        this.mirror = (this.mirror & 4) | (rot & 3);
+    }
+
+    public void toggleTexFlip() {
+        this.mirror ^= 4;
+    }
+
+    /** Old four-state values: 0 none, 1 U flip, 2 V flip, 3 both. */
+    private static int migrateMirror(int old) {
+        switch (old & 3) {
+            case 1: return 4;
+            case 2: return 2 | 4;
+            case 3: return 2;
+            default: return 0;
+        }
     }
 
     public double getOffsetX() {
@@ -135,6 +173,10 @@ public class TileShape extends TileArchitecture {
         this.readShapeFromNBT(nbt);
         this.readSecondaryMaterialFromNBT(nbt);
         this.offsetX = nbt.getByte("offsetX");
+        if (nbt.hasKey("Orient"))
+            this.mirror = nbt.getInteger("Orient");
+        else if (nbt.hasKey("Mirror"))
+            this.mirror = migrateMirror(nbt.getInteger("Mirror"));
     }
 
     @Override
@@ -175,6 +217,7 @@ public class TileShape extends TileArchitecture {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
+        nbt.setInteger("Orient", this.mirror);
         this.writeShapeToNBT(nbt);
         this.writeSecondaryMaterialToNBT(nbt);
         if (this.offsetX != 0)

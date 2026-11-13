@@ -136,6 +136,7 @@ public abstract class ShapeKind {
                         shape.setSide(neighbourShape.getSide());
                         shape.setTurn(turn);
                         shape.setOffsetX(neighbourShape.getOffsetX());
+                        shape.setMirror(neighbourShape.getMirror());
                         return true;
                     }
                 }

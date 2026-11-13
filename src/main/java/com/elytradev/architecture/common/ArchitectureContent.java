@@ -31,6 +31,7 @@ import com.elytradev.architecture.common.item.ItemChisel;
 import com.elytradev.architecture.common.item.ItemCladding;
 import com.elytradev.architecture.common.item.ItemHammer;
 import com.elytradev.architecture.common.item.ItemHashBrown;
+import com.elytradev.architecture.common.item.ItemPaintbrush;
 import com.elytradev.architecture.common.shape.ItemShape;
 import com.elytradev.architecture.common.shape.EnumShape;
 import com.elytradev.architecture.common.tile.TileSawbench;
@@ -93,6 +94,7 @@ public class ArchitectureContent {
     public Item itemHammer;
     public ItemCladding itemCladding;
     public ItemHashBrown itemHashBrown;
+    public ItemPaintbrush itemPaintbrush;
     private int recipeID = 0;
 
     private ModFixs dataFixer;
@@ -149,6 +151,7 @@ public class ArchitectureContent {
         this.itemHammer = this.registerItem(registry, "hammer", new ItemHammer());
         this.itemCladding = this.registerItem(registry, "cladding", new ItemCladding());
         this.itemHashBrown = this.registerItem(registry, "hash_brown", new ItemHashBrown());
+        this.itemPaintbrush = this.registerItem(registry, "paintbrush", new ItemPaintbrush());
 
         itemBlocksToRegister.forEach(registry::register);
 

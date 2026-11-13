@@ -86,6 +86,10 @@ public class ItemShape extends ItemBlock {
                 IBlockState neighbourState = world.getBlockState(neighbourPos);
                 TileEntity neighbourTile = world.getTileEntity(neighbourPos);
                 shape.getShape().orientOnPlacement(player, shape, neighbourPos, neighbourState, neighbourTile, face, hit);
+                // The client runs the same placement, but its neighbour may be a
+                // tick behind; publishing the tile makes the server's answer win.
+                if (!world.isRemote)
+                    shape.markBlockChanged();
             }
         }
         return true;
