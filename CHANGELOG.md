@@ -12,6 +12,12 @@
   player. Shift skips the copy.
 - Double Roof Tile: shift skips the neighbour copy, matching Double Siding and
   the ordinary shapes.
+- New Trim page under Roofing with three solid wedges. Each fills the triangle
+  under one roof family (1x2 rises half a block, 1x3 a third, 1x4 a quarter), so
+  a wedge closes the underside of the matching slope. Placement is the roof
+  rule, but a wedge only continues into another wedge of the same pitch; shift
+  skips that. Glow versions ride on the Glow page.
+- The Other page now sits below Siding.
 
 ## 3.108-0.2
 

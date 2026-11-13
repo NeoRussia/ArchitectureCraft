@@ -25,3 +25,6 @@ private.properties
 # Files from bad operating systems :^)
 Thumbs.db
 .DS_Store
+
+# log4j output from the icon renderer / dev runs
+/logs

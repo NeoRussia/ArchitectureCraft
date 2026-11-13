@@ -82,7 +82,7 @@ public class GuiSawbench extends BaseGui.Screen {
     @Override
     protected void drawBackgroundLayer() {
         glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.bindTexture("gui/gui_sawbench.png", 256, 256);
+        this.bindTexture(te.isCooked() ? "gui/gui_sawbench2.png" : "gui/gui_sawbench.png", 256, 256);
         this.drawTexturedRect(0, 0, this.xSize, this.ySize, 0, 0);
         this.drawShapeMenu();
         this.drawShapeSelection();

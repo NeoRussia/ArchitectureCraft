@@ -26,6 +26,8 @@ package com.elytradev.architecture.common.tile;
 
 import com.elytradev.architecture.common.shape.EnumShape;
 import com.elytradev.architecture.common.shape.ShapePage;
+import com.elytradev.architecture.common.ArchitectureMod;
+import com.elytradev.architecture.common.block.BlockSawbench;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.init.Blocks;
@@ -55,6 +57,15 @@ public class TileSawbench extends TileArchitectureInventory {
                     EnumShape.ROOF_OVERHANG_INNER_CORNER, EnumShape.ROOF_OVERHANG_GABLE_LH, EnumShape.ROOF_OVERHANG_GABLE_RH,
                     EnumShape.ROOF_OVERHANG_GABLE_END_LH, EnumShape.ROOF_OVERHANG_GABLE_END_RH, EnumShape.ROOF_OVERHANG_RIDGE,
                     EnumShape.ROOF_OVERHANG_VALLEY, EnumShape.BEVELLED_OUTER_CORNER, EnumShape.BEVELLED_INNER_CORNER),
+            new ShapePage("architecturecraft.shapepage.slopes",
+                    EnumShape.SLOPE_TILE_A1, EnumShape.SLOPE_TILE_A2,
+                    EnumShape.SLOPE_TILE_B1, EnumShape.SLOPE_TILE_B2, EnumShape.SLOPE_TILE_B3,
+                    EnumShape.SLOPE_TILE_C1, EnumShape.SLOPE_TILE_C2, EnumShape.SLOPE_TILE_C3,
+                    EnumShape.SLOPE_TILE_C4,
+                    EnumShape.WEDGE_A_BASE, EnumShape.WEDGE_A_TIP,
+                    EnumShape.WEDGE_B_BASE, EnumShape.WEDGE_B_MIDDLE, EnumShape.WEDGE_B_TIP,
+                    EnumShape.WEDGE_C_BASE, EnumShape.WEDGE_C_MIDDLE_1, EnumShape.WEDGE_C_MIDDLE_2,
+                    EnumShape.WEDGE_C_TIP),
             new ShapePage("architecturecraft.shapepage.rounded",
                     EnumShape.CYLINDER, EnumShape.CYLINDER_HALF, EnumShape.CYLINDER_QUARTER, EnumShape.CYLINDER_LARGE_QUARTER, EnumShape.ANTICYLINDER_LARGE_QUARTER,
                     EnumShape.PILLAR, EnumShape.POST, EnumShape.POLE, EnumShape.SPHERE_FULL, EnumShape.SPHERE_HALF,
@@ -73,16 +84,16 @@ public class TileSawbench extends TileArchitectureInventory {
                     EnumShape.BANISTER_PLAIN_TOP, EnumShape.BANISTER_PLAIN, EnumShape.BANISTER_PLAIN_BOTTOM, EnumShape.BANISTER_PLAIN_END, EnumShape.BANISTER_PLAIN_INNER_CORNER,
                     EnumShape.BALUSTRADE_FANCY, EnumShape.BALUSTRADE_FANCY_CORNER, EnumShape.BALUSTRADE_FANCY_WITH_NEWEL, EnumShape.BALUSTRADE_FANCY_NEWEL,
                     EnumShape.BANISTER_FANCY_TOP, EnumShape.BANISTER_FANCY, EnumShape.BANISTER_FANCY_BOTTOM, EnumShape.BANISTER_FANCY_END, EnumShape.BANISTER_FANCY_NEWEL_TALL),
-            new ShapePage("architecturecraft.shapepage.other",
-                    EnumShape.CLADDING_SHEET, EnumShape.SLAB, EnumShape.STAIRS, EnumShape.STAIRS_OUTER_CORNER, EnumShape.STAIRS_INNER_CORNER,
-                    EnumShape.SLOPE_TILE_A1, EnumShape.SLOPE_TILE_A2, EnumShape.SLOPE_TILE_B1, EnumShape.SLOPE_TILE_B2, EnumShape.SLOPE_TILE_B3,
-                    EnumShape.SLOPE_TILE_C1, EnumShape.SLOPE_TILE_C2, EnumShape.SLOPE_TILE_C3, EnumShape.SLOPE_TILE_C4,
-                    EnumShape.ANGLED_ROOF_RIDGE, EnumShape.DOUBLE_ROOF_TILE, EnumShape.WALL, EnumShape.FENCE, EnumShape.GREG_TECH),
             new ShapePage("architecturecraft.shapepage.glow",
                     EnumShape.SQUARE_SE, EnumShape.SLAB_SE, EnumShape.ROOF_TILE_SE,
                     EnumShape.SLOPE_TILE_A1_SE, EnumShape.SLOPE_TILE_A2_SE, EnumShape.SLOPE_TILE_B1_SE,
                     EnumShape.SLOPE_TILE_B2_SE, EnumShape.SLOPE_TILE_B3_SE, EnumShape.SLOPE_TILE_C1_SE,
                     EnumShape.SLOPE_TILE_C2_SE, EnumShape.SLOPE_TILE_C3_SE, EnumShape.SLOPE_TILE_C4_SE),
+            new ShapePage("architecturecraft.shapepage.glow2",
+                    EnumShape.WEDGE_A_BASE_SE, EnumShape.WEDGE_A_TIP_SE,
+                    EnumShape.WEDGE_B_BASE_SE, EnumShape.WEDGE_B_MIDDLE_SE, EnumShape.WEDGE_B_TIP_SE,
+                    EnumShape.WEDGE_C_BASE_SE, EnumShape.WEDGE_C_MIDDLE_1_SE, EnumShape.WEDGE_C_MIDDLE_2_SE,
+                    EnumShape.WEDGE_C_TIP_SE),
             new ShapePage("architecturecraft.shapepage.siding",
                     EnumShape.ROOF_TILE_SIDING,
                     EnumShape.SLOPE_TILE_A1_SIDING, EnumShape.SLOPE_TILE_A2_SIDING,
@@ -91,9 +102,28 @@ public class TileSawbench extends TileArchitectureInventory {
                     EnumShape.SLOPE_TILE_C1_SIDING, EnumShape.SLOPE_TILE_C2_SIDING,
                     EnumShape.SLOPE_TILE_C3_SIDING, EnumShape.SLOPE_TILE_C4_SIDING,
                     EnumShape.PANELING, EnumShape.DOUBLE_SIDING),
+            new ShapePage("architecturecraft.shapepage.other",
+                    EnumShape.CLADDING_SHEET, EnumShape.SLAB, EnumShape.STAIRS, EnumShape.STAIRS_OUTER_CORNER, EnumShape.STAIRS_INNER_CORNER,
+                    EnumShape.ANGLED_ROOF_RIDGE, EnumShape.DOUBLE_ROOF_TILE, EnumShape.WALL, EnumShape.FENCE, EnumShape.GREG_TECH),
     };
 
     public IInventory inventory = new InventoryBasic("Items", false, 2);
+
+    /** Set once this block has been fed a sawbench; it then shows the second GUI. */
+    private boolean cooked;
+
+    public boolean isCooked() {
+        return this.cooked;
+    }
+
+    public void setCooked(boolean cooked) {
+        if (this.cooked == cooked)
+            return;
+        this.cooked = cooked;
+        this.markBlockChanged();
+        if (this.world != null && !this.world.isRemote)
+            this.sendTileEntityUpdate();
+    }
     public int selectedPage = 0;
     public int[] selectedSlots = new int[pages.length];
     public boolean pendingMaterialUsage = false; // Material for the stack in the result slot
@@ -117,6 +147,12 @@ public class TileSawbench extends TileArchitectureInventory {
     public void setInventorySlotContents(int i, ItemStack stack) {
         super.setInventorySlotContents(i, stack);
         this.updateResultSlot();
+        if (i == materialSlot && !stack.isEmpty() && this.world != null && !this.world.isRemote
+                && Block.getBlockFromItem(stack.getItem()) instanceof BlockSawbench) {
+            // Feeding a sawbench to a sawbench cooks it; the material is taken
+            // when the hash brown leaves the output, like any other recipe.
+            this.setCooked(true);
+        }
     }
 
     @Override
@@ -183,6 +219,7 @@ public class TileSawbench extends TileArchitectureInventory {
                 this.selectedSlots[page] = slot >= 0 && slot < pages[page].size() ? slot : 0;
             }
         this.pendingMaterialUsage = tc.getBoolean("PMU");
+        this.cooked = tc.getBoolean("Cooked");
     }
 
     @Override
@@ -191,6 +228,7 @@ public class TileSawbench extends TileArchitectureInventory {
         tc.setInteger("Page", this.selectedPage);
         tc.setIntArray("Slots", this.selectedSlots);
         tc.setBoolean("PMU", this.pendingMaterialUsage);
+        tc.setBoolean("Cooked", this.cooked);
         return tc;
     }
 
@@ -217,6 +255,9 @@ public class TileSawbench extends TileArchitectureInventory {
     }
 
     protected ItemStack makeResultStack() {
+        ItemStack inSlot = this.getStackInSlot(materialSlot);
+        if (!inSlot.isEmpty() && Block.getBlockFromItem(inSlot.getItem()) instanceof BlockSawbench)
+            return new ItemStack(ArchitectureMod.CONTENT.itemHashBrown, 1);
         EnumShape resultShape = this.getSelectedShape();
         if (resultShape != null) {
             ItemStack materialStack = this.getStackInSlot(materialSlot);
@@ -243,6 +284,9 @@ public class TileSawbench extends TileArchitectureInventory {
     }
 
     public int materialMultiple() {
+        ItemStack feeding = this.getStackInSlot(materialSlot);
+        if (!feeding.isEmpty() && Block.getBlockFromItem(feeding.getItem()) instanceof BlockSawbench)
+            return 1;
         int factor = 1;
         ItemStack materialStack = this.getStackInSlot(materialSlot);
         if (!materialStack.isEmpty()) {
