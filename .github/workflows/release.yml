@@ -41,7 +41,7 @@ jobs:
 
       # The wrapper is Gradle 4.1 and ForgeGradle 2.3 refuses anything newer
       # than Java 8, which is also what the mod compiles against.
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '8'
@@ -131,7 +131,7 @@ jobs:
           curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ env.CURSEFORGE_TOKEN }}
           files: build/libs/${{ steps.jar.outputs.name }}.jar
-          additional-files: build/libs/${{ steps.jar.outputs.name }}-sources.jar
+          files-secondary: build/libs/${{ steps.jar.outputs.name }}-sources.jar
           name: ${{ steps.jar.outputs.name }}
           version: ${{ env.TAG }}
           version-type: release
