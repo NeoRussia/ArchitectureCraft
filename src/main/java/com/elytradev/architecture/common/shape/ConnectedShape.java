@@ -91,6 +91,11 @@ public abstract class ConnectedShape extends ShapeKind {
     }
 
     @Override
+    public boolean usesConnections() {
+        return true;
+    }
+
+    @Override
     public boolean acceptsCladding() {
         return false;
     }

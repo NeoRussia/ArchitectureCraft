@@ -247,32 +247,10 @@ public class BlockShape extends BlockArchitecture<TileShape> {
 
     @Override
     public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
-        RayTraceResult result = null;
-        double nearestDistance = 0;
-        List<AxisAlignedBB> list = this.getGlobalCollisionBoxes(world, pos, state, null);
-        if (list != null) {
-            int n = list.size();
-            for (int i = 0; i < n; i++) {
-                AxisAlignedBB box = list.get(i);
-                RayTraceResult mp = box.calculateIntercept(start, end);
-                if (mp != null) {
-                    mp.subHit = i;
-                    double d = start.squareDistanceTo(mp.hitVec);
-                    if (result == null || d < nearestDistance) {
-                        result = mp;
-                        nearestDistance = d;
-                    }
-                }
-            }
-        }
-        if (result != null) {
-            //setBlockBounds(list.get(result.subHit));
-            int i = result.subHit;
-            this.boxHit = list.get(i).offset(-pos.getX(), -pos.getY(), -pos.getZ());
-            result = new RayTraceResult(result.hitVec, result.sideHit, pos);
-            result.subHit = i;
-        }
-        return result;
+        // Picking follows vanilla: BlockArchitecture asks getCollisionBoundingBox
+        // for the single selection box. Testing the collision list here (the old
+        // body) is what made fences pick at 1.5 instead of at the model.
+        return super.collisionRayTrace(state, world, pos, start, end);
     }
 
     @Override

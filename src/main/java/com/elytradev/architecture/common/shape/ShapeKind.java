@@ -156,8 +156,18 @@ public abstract class ShapeKind {
         return false;
     }
 
+    /**
+     * True when a click near a face edge has something to toggle. Shapes that
+     * do not use connections treat every click as a centre click, so a chisel
+     * removes cladding from thin pieces (slope ends, siding, wedges) instead of
+     * toggling a connection that does not exist.
+     */
+    public boolean usesConnections() {
+        return false;
+    }
+
     public void onChiselUse(TileShape te, EntityPlayer player, EnumFacing face, Vector3 hit) {
-        EnumFacing side = this.zoneHit(face, hit);
+        EnumFacing side = this.usesConnections() ? this.zoneHit(face, hit) : null;
         //ArchitectureLog.info("ShapeKind.onChiselUse: face = %s, hit = %s, side = %s\n", face, hit, side);
         if (side != null)
             this.chiselUsedOnSide(te, player, side);
@@ -612,6 +622,11 @@ public abstract class ShapeKind {
 //				dropSecondaryMaterial(te, player, stack);
 //			}
 //		}
+
+        @Override
+        public boolean usesConnections() {
+            return true;
+        }
 
         @Override
         public boolean isValidSecondaryMaterial(IBlockState state) {

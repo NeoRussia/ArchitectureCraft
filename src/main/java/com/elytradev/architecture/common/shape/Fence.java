@@ -107,22 +107,22 @@ public class Fence extends ConnectedShape {
                                         Entity entity,
                                         Trans3 t,
                                         List list) {
-        // Entity collision only: post and arms, 1.5 blocks tall, as vanilla's
-        // BlockFence.addCollisionBoxToList. Picking never uses these boxes.
+        // Entity collision only, as vanilla's BlockFence: a 4 px post and 2 px
+        // arms butted against it, 1.5 blocks tall. Picking never uses these.
         this.addBox(new Vector3(-0.125, -0.5, -0.125),
                 new Vector3(0.125, 1.0, 0.125), t, list);
         if (isConnected(te, EnumFacing.NORTH))
-            this.addBox(new Vector3(-0.125, -0.5, -0.5),
-                    new Vector3(0.125, 1.0, 0.0), t, list);
+            this.addBox(new Vector3(-0.0625, -0.5, -0.5),
+                    new Vector3(0.0625, 1.0, -0.125), t, list);
         if (isConnected(te, EnumFacing.SOUTH))
-            this.addBox(new Vector3(-0.125, -0.5, 0.0),
-                    new Vector3(0.125, 1.0, 0.5), t, list);
+            this.addBox(new Vector3(-0.0625, -0.5, 0.125),
+                    new Vector3(0.0625, 1.0, 0.5), t, list);
         if (isConnected(te, EnumFacing.WEST))
-            this.addBox(new Vector3(-0.5, -0.5, -0.125),
-                    new Vector3(0.0, 1.0, 0.125), t, list);
+            this.addBox(new Vector3(-0.5, -0.5, -0.0625),
+                    new Vector3(-0.125, 1.0, 0.0625), t, list);
         if (isConnected(te, EnumFacing.EAST))
-            this.addBox(new Vector3(0.0, -0.5, -0.125),
-                    new Vector3(0.5, 1.0, 0.125), t, list);
+            this.addBox(new Vector3(0.125, -0.5, -0.0625),
+                    new Vector3(0.5, 1.0, 0.0625), t, list);
     }
 
     @Override
