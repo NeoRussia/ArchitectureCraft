@@ -32,6 +32,10 @@ jobs:
       TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
       # ForgeGradle 2.3 unpacks a lot; the default 512m heap is not enough.
       GRADLE_OPTS: -Xmx2g
+      # Job-level so the upload step can test them in its `if`; GitHub does not
+      # expose secrets to step conditions otherwise.
+      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -112,3 +116,25 @@ jobs:
             build/libs/*.jar
             build/libs/SHA256SUMS.txt
           fail_on_unmatched_files: true
+
+      # Modrinth and CurseForge. Runs only when their tokens are configured, so
+      # a tag still publishes to GitHub while the project pages are pending.
+      # The first upload of each project has to be manual: CurseForge reviews a
+      # project only once a file exists, and Modrinth needs the project id.
+      - name: Publish to Modrinth and CurseForge
+        if: env.MODRINTH_TOKEN != '' || env.CURSEFORGE_TOKEN != ''
+        continue-on-error: true
+        uses: Kir-Antipov/mc-publish@v3
+        with:
+          modrinth-id: ${{ secrets.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ env.MODRINTH_TOKEN }}
+          curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ env.CURSEFORGE_TOKEN }}
+          files: build/libs/${{ steps.jar.outputs.name }}.jar
+          additional-files: build/libs/${{ steps.jar.outputs.name }}-sources.jar
+          name: ${{ steps.jar.outputs.name }}
+          version: ${{ env.TAG }}
+          version-type: release
+          loaders: forge
+          game-versions: 1.12.2
+          changelog-file: docs/releases/${{ env.TAG }}.md
