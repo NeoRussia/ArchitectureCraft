@@ -30,7 +30,7 @@ are untouched; `117` is Renovated-specific:
 | 129 | Paneling |
 | 130 | Double Siding |
 | 131 | GregTech |
-| 132-137 | Trim wedges: 1x2, 1x3, 1x4 and their glow versions |
+| 132-149 | Corner wedges: A/B/C families in 2, 3 and 4 bands, plus glow duplicates |
 
 The shapes use the existing `architecturecraft:shape` block and `TileShape`.
 They add no new block, tile entity or per-shape blockstate. The glow

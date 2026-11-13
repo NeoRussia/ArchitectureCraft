@@ -12,11 +12,13 @@
   player. Shift skips the copy.
 - Double Roof Tile: shift skips the neighbour copy, matching Double Siding and
   the ordinary shapes.
-- New Trim page under Roofing with three solid wedges. Each fills the triangle
-  under one roof family (1x2 rises half a block, 1x3 a third, 1x4 a quarter), so
-  a wedge closes the underside of the matching slope. Placement is the roof
-  rule, but a wedge only continues into another wedge of the same pitch; shift
-  skips that. Glow versions ride on the Glow page.
+- New Slopes page, holding the nine slope tiles beside nine new corner wedges.
+  A wedge is one band of a corner pyramid: the base band fills the block, the
+  bands above shrink toward the apex, and the apex lands on the top corner of
+  the tip block. Three families - 1x2 in two bands, 1x3 in three, 1x4 in four -
+  with the family letter on the sawbench icon. Placement is the roof rule, but
+  a wedge only continues into its own family; shift skips that. Glow duplicates
+  sit on a new Glow 2 page below Glow.
 - The Other page now sits below Siding.
 
 ## 3.108-0.2
