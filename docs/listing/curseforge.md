@@ -83,16 +83,16 @@ every change is reviewed, tested and understood by me before it
 ships.
 ```
 
-## File 0.3
+## File 0.4
 
 | Field | Value |
 |---|---|
-| Upload | architecturecraft-renovated.3.108-0.3.jar |
-| Display name | 0.3 |
+| Upload | architecturecraft-renovated.3.108-0.4.jar |
+| Display name | 0.4 |
 | Release type | Release |
 | Supported version | 1.12.2 |
 | Loader | Forge |
-| Changelog | the `3.108-0.3` section of CHANGELOG.md |
+| Changelog | the `3.108-0.4` section of CHANGELOG.md |
 
 The sources jar is not a separate CurseForge file; keep it on the GitHub
 release, or add it as an extra file on the same version if you want it there.

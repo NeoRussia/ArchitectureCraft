@@ -8,13 +8,13 @@ ext {
     // What the mod reports to Forge and in mcmod.info. Keep MOD_VER in
     // ArchitectureMod.java in step with it; the download name comes from
     // `releaseName` below.
-    version = '3.108-0.3'
+    version = '3.108-0.4'
 
     // Name of the released jar, without the extension or the classifier.
     // Kept apart from `version`, which is what the mod reports to Forge and in
     // mcmod.info: renaming the download must not change what the mod calls
     // itself.
-    releaseName = 'architecturecraft-renovated.3.108-0.3'
+    releaseName = 'architecturecraft-renovated.3.108-0.4'
 
     concreteVersion = '0.3.3-SNAPSHOT'
     concreteModules = ['all']

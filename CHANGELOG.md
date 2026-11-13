@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.108-0.4
+
+- Fence picking uses the selection box again instead of the collision list, so
+  a click on a fence cap reports the top face and blocks can be placed on
+  fences. Collision arms narrowed to vanilla's 2 px.
+- The chisel strips cladding from thin shapes: slope ends, sidings, paneling,
+  plaque and wedges treat any click as a centre click instead of toggling a
+  connection that does not exist. Walls and fences keep their edge zones.
+- Added the Paintbrush: use turns a shape's texture a quarter turn, shift-use
+  toggles the mirror. The orientation is per block, saved with the tile,
+  synced to clients and inherited by a piece placed against a turned one.
+
 ## 3.108-0.3
 
 - Siding placement answers the mouse: on a wall the half of the face you click
