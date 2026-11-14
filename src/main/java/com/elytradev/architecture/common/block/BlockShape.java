@@ -103,6 +103,34 @@ public class BlockShape extends BlockArchitecture<TileShape> {
             return toolLevel >= block.getHarvestLevel(state);
     }
 
+    /**
+     * Forge's harvest check, the one that knows where the block is.
+     *
+     * <p>The tool a shape needs belongs to the material it was cut from, which
+     * lives in the tile entity. The state-only hooks above cannot reach it, so
+     * every shape answered "no tool required" and dropped to a bare hand,
+     * whatever it was made of. This overload has the position, so it can ask
+     * the tile.</p>
+     */
+    @Override
+    public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
+        TileShape shape = TileShape.get(world, pos);
+        if (shape == null || !shape.hasBaseBlockState())
+            return super.canHarvestBlock(world, pos, player);
+        IBlockState base = shape.getBaseBlockState();
+        Block baseBlock = base.getBlock();
+        if (baseBlock.getMaterial(base).isToolNotRequired())
+            return true;
+        String tool = baseBlock.getHarvestTool(base);
+        if (tool == null)
+            return true;
+        ItemStack held = player.getHeldItemMainhand();
+        if (held.isEmpty())
+            return false;
+        int level = held.getItem().getHarvestLevel(held, tool, player, base);
+        return level >= baseBlock.getHarvestLevel(base);
+    }
+
     @Nullable
     @Override
     public String getHarvestTool(IBlockState state) {

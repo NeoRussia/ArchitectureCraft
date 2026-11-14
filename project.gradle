@@ -51,11 +51,18 @@ if (!ext.early) {
             name = "Architect maven"
             url = "http://maven.cil.li/"
         }
+        maven {
+            // The One Probe, compile-time only for the probe integration
+            name = "CurseMaven"
+            url = "https://cursemaven.com"
+        }
     }
 
     dependencies {
         deobfProvided "mezz.jei:jei_1.12.2:4.7.10.98:api"
         runtime "mezz.jei:jei_1.12.2:4.7.10.98"
         compile "li.cil.architect:Architect:MC1.12-1.2.0.6"
+        // Pinned to the file the pack ships; nothing is bundled into our jar.
+        deobfProvided "curse.maven:the-one-probe-245211:2667280"
     }
 }

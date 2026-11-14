@@ -106,3 +106,21 @@ tooltip.architecturecraft.cutfrom=Материал: %s
 
 architecturecraft.gui.sawbench.title=Верстак архитектора
 architecturecraft.gui.sawbench.ratio=Из %s в %s
+
+# The One Probe
+tooltip.architecturecraft.tool=Инструмент: %s (уровень %s)
+tooltip.architecturecraft.tool.pickaxe=кирка
+tooltip.architecturecraft.tool.axe=топор
+tooltip.architecturecraft.tool.shovel=лопата
+tooltip.architecturecraft.tool.hoe=мотыга
+tooltip.architecturecraft.tool.shears=ножницы
+tooltip.architecturecraft.tool.sword=меч
+tooltip.architecturecraft.light=Свет: %s
+tooltip.architecturecraft.connections=Соединения: %s
+tooltip.architecturecraft.texture.rotated=Текстура повёрнута на %s°
+tooltip.architecturecraft.texture.mirrored=Текстура отражена
+tooltip.architecturecraft.texture.rotated_mirrored=Текстура повёрнута на %s°, отражена
+tooltip.architecturecraft.direction.north=север
+tooltip.architecturecraft.direction.south=юг
+tooltip.architecturecraft.direction.east=восток
+tooltip.architecturecraft.direction.west=запад

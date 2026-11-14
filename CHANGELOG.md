@@ -2,6 +2,15 @@
 
 ## 3.108-0.5
 
+- The One Probe support: probing a shape shows its name and material with the
+  mod name, plus the cladding, the light a glowing shape gives off, the arms of
+  walls and fences and, when sneaking, the texture turn the paintbrush set. The
+  probe also reports the tool the material needs, and whether the held tool can
+  harvest it. Everything is optional: without The One Probe installed nothing
+  changes and nothing extra is loaded.
+- Shapes need the tool their material needs. A stone or obsidian shape no
+  longer drops when broken by hand; it wants the same pickaxe its material
+  would. Before this, every shape was treated as needing no tool at all.
 - Redrawing a chunk that holds shapes costs a fraction of what it did. Light
   was sampled from the world once per vertex and the shape's own light value
   re-read for every sampled cell; both are now read once per shape, and

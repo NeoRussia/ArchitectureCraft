@@ -30,9 +30,11 @@ import com.elytradev.architecture.common.ArchitectureGuiHandler;
 import com.elytradev.architecture.common.ArchitectureLog;
 import com.elytradev.architecture.common.ArchitectureMod;
 import com.elytradev.architecture.common.network.ArchitectureNetworking;
+import com.elytradev.architecture.compat.top.TopCompatibility;
 import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -47,6 +49,8 @@ public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent e) {
         ArchitectureNetworking.setupNetwork();
+        if (Loader.isModLoaded("theoneprobe"))
+            TopCompatibility.register();
     }
 
     public void init(FMLInitializationEvent e) {

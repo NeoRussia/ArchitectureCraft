@@ -168,5 +168,23 @@ tooltip.architecturecraft.basematerial=Base: %s
 tooltip.architecturecraft.secondarymaterial=Secondary: %s
 tooltip.architecturecraft.cutfrom=Cut from: %s
 
+# The One Probe
+tooltip.architecturecraft.tool=Tool: %s (level %s)
+tooltip.architecturecraft.tool.pickaxe=Pickaxe
+tooltip.architecturecraft.tool.axe=Axe
+tooltip.architecturecraft.tool.shovel=Shovel
+tooltip.architecturecraft.tool.hoe=Hoe
+tooltip.architecturecraft.tool.shears=Shears
+tooltip.architecturecraft.tool.sword=Sword
+tooltip.architecturecraft.light=Light: %s
+tooltip.architecturecraft.connections=Arms: %s
+tooltip.architecturecraft.texture.rotated=Texture turned %s°
+tooltip.architecturecraft.texture.mirrored=Texture mirrored
+tooltip.architecturecraft.texture.rotated_mirrored=Texture turned %s°, mirrored
+tooltip.architecturecraft.direction.north=North
+tooltip.architecturecraft.direction.south=South
+tooltip.architecturecraft.direction.east=East
+tooltip.architecturecraft.direction.west=West
+
 architecturecraft.gui.sawbench.title=Sawbench
 architecturecraft.gui.sawbench.ratio=%s makes %s
