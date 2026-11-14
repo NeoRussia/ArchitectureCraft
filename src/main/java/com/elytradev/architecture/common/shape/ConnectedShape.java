@@ -95,6 +95,20 @@ public abstract class ConnectedShape extends ShapeKind {
         return true;
     }
 
+    /**
+     * Connections are derived from the world while rendering, so they are part
+     * of what makes one render of this shape differ from another. The four
+     * horizontal bits are exactly what {@code renderShape} reads.
+     */
+    @Override
+    public long neighbourSignature(TileShape te) {
+        int mask = 0;
+        for (EnumFacing dir : EnumFacing.HORIZONTALS)
+            if (this.isConnected(te, dir))
+                mask |= 1 << dir.ordinal();
+        return mask;
+    }
+
     @Override
     public boolean acceptsCladding() {
         return false;

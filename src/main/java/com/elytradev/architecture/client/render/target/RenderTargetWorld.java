@@ -63,6 +63,14 @@ public class RenderTargetWorld extends RenderTargetBase {
     protected final boolean shaderPackInUse;
     protected float vr, vg, vb, va; // Colour to be applied to next vertex
     protected int vlm1, vlm2; // Light map values to be applied to next vertex
+    /**
+     * The block's own light value. It cannot change while one shape is being
+     * drawn, but the old code re-read it through the block state for every
+     * sampled cell.
+     */
+    private final int lightValue;
+    /** Memo of this shape's light samples; null when ambient occlusion is off. */
+    private final LightSamples samples;
     private BufferBuilder buff;
     /** Asks another shape what its faces look like, for the culling check. */
     private NeighbourGeometry neighbourGeometry;
@@ -141,6 +149,10 @@ public class RenderTargetWorld extends RenderTargetBase {
         this.shaderPackInUse = !inPreview && ShaderCompat.isShaderPackInUse();
         this.ao = Minecraft.isAmbientOcclusionEnabled() && this.block.getLightValue(this.blockState) == 0;
         this.expandTrianglesToQuads = true;
+        this.lightValue = this.blockState.getLightValue();
+        this.samples = this.ao ? AO_SAMPLES.get() : null;
+        if (this.samples != null)
+            this.samples.begin(this.world);
     }
 
 
@@ -202,37 +214,57 @@ public class RenderTargetWorld extends RenderTargetBase {
         double maxZ = Math.min(v.z + 1.0, vz + 1.0);
         double volInv = 1.0 / ((maxX - minX) * (maxY - minY) * (maxZ - minZ));
 
-        for (int dx = -1; dx <= 1; dx++) {
-            int X = ifloor(v.x + dx);
-            double wox = Math.max(0, Math.min(maxX, X + 1.0) - Math.max(minX, (double) X));
-            if (wox <= 0)
-                continue;
-            for (int dy = -1; dy <= 1; dy++) {
-                int Y = ifloor(v.y + dy);
-                double woy = Math.max(0, Math.min(maxY, Y + 1.0) - Math.max(minY, (double) Y));
-                if (woy <= 0)
-                    continue;
-                for (int dz = -1; dz <= 1; dz++) {
-                    int Z = ifloor(v.z + dz);
-                    double woz = Math.max(0, Math.min(maxZ, Z + 1.0) - Math.max(minZ, (double) Z));
-                    if (woz <= 0)
-                        continue;
-                    double w = volInv * wox * woy * woz;
-                    BlockPos pos = new BlockPos(X, Y, Z);
+        // Each axis contributes at most three candidates, and only the ones
+        // with an overlap are kept. Working them out once per vertex rather
+        // than once per combination of the other two axes leaves the same
+        // cells in the same order, so the sums are bit-identical.
+        LightSamples scratch = this.samples;
+        int[] xs = scratch.xs, ys = scratch.ys, zs = scratch.zs;
+        double[] wx = scratch.wx, wy = scratch.wy, wz = scratch.wz;
+        int nx = axisCells(v.x, minX, maxX, xs, wx);
+        int ny = axisCells(v.y, minY, maxY, ys, wy);
+        int nz = axisCells(v.z, minZ, maxZ, zs, wz);
+        BlockPos.MutableBlockPos pos = scratch.pos;
+        int blockX = this.blockPos.getX(), blockY = this.blockPos.getY(), blockZ = this.blockPos.getZ();
+
+        for (int ix = 0; ix < nx; ix++) {
+            int X = xs[ix];
+            double wox = wx[ix];
+            for (int iy = 0; iy < ny; iy++) {
+                int Y = ys[iy];
+                double woy = wy[iy];
+                for (int iz = 0; iz < nz; iz++) {
+                    int Z = zs[iz];
+                    double w = volInv * wox * woy * wz[iz];
+                    // Every vertex of a shape samples the same handful of cells,
+                    // so remember what each cell said instead of asking the world
+                    // again for each of the shape's vertices.
+                    int slot = scratch.slot(X - blockX, Y - blockY, Z - blockZ);
                     int br;
-                    try {
-                        br = this.block.getPackedLightmapCoords(this.blockState, this.world, pos);
-                    } catch (RuntimeException e) {
-                        ArchitectureLog.info("BaseWorldRenderTarget.aoLightVertex: getMixedBrightnessForBlock(%s) with weight %s for block at %s: %s\n",
-                                pos, w, this.blockPos, e);
-                        throw e;
-                    }
                     float lv;
-                    if (!pos.equals(this.blockPos)) {
-                        IBlockState state = this.world.getBlockState(pos);
-                        lv = state.getBlock().getAmbientOcclusionLightValue(state);
-                    } else
-                        lv = 1.0f;
+                    if (slot >= 0 && scratch.used[slot]) {
+                        br = scratch.light[slot];
+                        lv = scratch.ao[slot];
+                    } else {
+                        pos.setPos(X, Y, Z);
+                        try {
+                            br = this.sampleLight(pos);
+                        } catch (RuntimeException e) {
+                            ArchitectureLog.info("BaseWorldRenderTarget.aoLightVertex: getMixedBrightnessForBlock(%s) with weight %s for block at %s: %s\n",
+                                    pos, w, this.blockPos, e);
+                            throw e;
+                        }
+                        if (X != blockX || Y != blockY || Z != blockZ) {
+                            IBlockState state = this.world.getBlockState(pos);
+                            lv = state.getBlock().getAmbientOcclusionLightValue(state);
+                        } else
+                            lv = 1.0f;
+                        if (slot >= 0) {
+                            scratch.used[slot] = true;
+                            scratch.light[slot] = br;
+                            scratch.ao[slot] = lv;
+                        }
+                    }
                     if (br != 0) {
                         double br1 = ((br >> 16) & 0xff) / 240.0;
                         double br2 = (br & 0xff) / 240.0;
@@ -248,9 +280,38 @@ public class RenderTargetWorld extends RenderTargetBase {
         if (wt > 0)
             brv = (iround(brSum1 / wt * 0xf0) << 16) | iround(brSum2 / wt * 0xf0);
         else
-            brv = this.block.getPackedLightmapCoords(this.blockState, this.world, this.blockPos);
+            brv = this.sampleLight(this.blockPos);
         float lvv = (float) lvSum;
         this.setLight((this.shaderPackInUse ? 1.0f : this.shade) * lvv, brv);
+    }
+
+    /**
+     * Collects the cells on one axis with a non-zero overlap and their weights,
+     * returning how many there are. Ascending, as the old nested loops were.
+     */
+    private static int axisCells(double v, double min, double max, int[] cells, double[] weights) {
+        int count = 0;
+        for (int d = -1; d <= 1; d++) {
+            int cell = ifloor(v + d);
+            double weight = Math.max(0, Math.min(max, cell + 1.0) - Math.max(min, (double) cell));
+            if (weight > 0) {
+                cells[count] = cell;
+                weights[count] = weight;
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * The light map value at a position. Equivalent to
+     * {@code block.getPackedLightmapCoords(state, world, pos)} for the blocks
+     * this target renders: their light value is fixed for the whole shape, and
+     * none of them are slabs, which is the only case that method treats
+     * specially.
+     */
+    protected int sampleLight(BlockPos pos) {
+        return this.world.getCombinedLight(pos, this.lightValue);
     }
 
     protected void brLightVertex(Vector3 p) {
@@ -263,9 +324,57 @@ public class RenderTargetWorld extends RenderTargetBase {
                     (int) floor(p.z + 0.01 * n.z));
         else
             pos = this.blockPos;
-        int br = this.block.getPackedLightmapCoords(this.blockState, this.world, pos);
+        int br = this.sampleLight(pos);
         this.setLight(this.shaderPackInUse ? 1.0f : this.shade, br);
     }
+
+    /**
+     * Per-shape memo of the light samples {@link #aoLightVertex} takes.
+     *
+     * <p>Ambient occlusion walks a 3x3x3 cube around every vertex, and a shape
+     * has dozens of vertices over the same small neighbourhood, so the same
+     * cells are sampled over and over. Each entry holds what the world said
+     * the first time.</p>
+     *
+     * <p>The table is reused between shapes on a thread to avoid allocating it
+     * per block, and is reset for every shape because a light value cached
+     * across a rebuild could outlive the block change that altered it.</p>
+     */
+    private static final class LightSamples {
+
+        private static final int R = 3;
+        private static final int N = 2 * R + 1;
+
+        final int[] light = new int[N * N * N];
+        final float[] ao = new float[N * N * N];
+        final boolean[] used = new boolean[N * N * N];
+        /** Per-axis candidates for one vertex; three is the most an axis can have. */
+        final int[] xs = new int[3], ys = new int[3], zs = new int[3];
+        final double[] wx = new double[3], wy = new double[3], wz = new double[3];
+        /** Reused lookup position, so sampling a cell does not allocate. */
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        IBlockAccess world;
+
+        void begin(IBlockAccess world) {
+            this.world = world;
+            Arrays.fill(this.used, false);
+        }
+
+        /** Slot for a block offset from the shape, or -1 when it cannot be cached. */
+        int slot(int dx, int dy, int dz) {
+            if (dx < -R || dx > R || dy < -R || dy > R || dz < -R || dz > R)
+                return -1;
+            return ((dx + R) * N + (dy + R)) * N + (dz + R);
+        }
+
+    }
+
+    private static final ThreadLocal<LightSamples> AO_SAMPLES = new ThreadLocal<LightSamples>() {
+        @Override
+        protected LightSamples initialValue() {
+            return new LightSamples();
+        }
+    };
 
     protected void setLight(float shadow, int br) {
         this.vr = shadow * this.cmr * this.r();

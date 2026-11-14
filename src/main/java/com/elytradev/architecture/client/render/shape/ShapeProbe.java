@@ -33,8 +33,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -75,6 +77,74 @@ public final class ShapeProbe extends RenderTargetBase {
                 renderBase, renderSecondary, baseColour, secondaryColour);
         return probe;
     }
+
+    /**
+     * Everything about a shape that decides where its faces land, or
+     * {@link #NO_KEY} when that cannot be summarised and the result must not be
+     * cached.
+     *
+     * <p>Probing renders the neighbour, which is far more work than the check
+     * that needs its answer, and a wall of identical shapes asks the same
+     * question once per block. The key covers the inputs the shape renderers
+     * actually read: shape, side, turn, the chisel's connection bits, whatever
+     * {@link ShapeKind#neighbourSignature} reports about the surroundings, and
+     * which materials are drawn. The texture turn and flip are not here because
+     * they only rewrite UVs.</p>
+     */
+    public static long keyFor(TileShape te, boolean renderBase, boolean renderSecondary) {
+        if (te.getShape() == null)
+            return NO_KEY;
+        long neighbourhood = te.getShape().kind.neighbourSignature(te);
+        if (neighbourhood < 0)
+            return NO_KEY;
+        int disabled = 0;
+        for (EnumFacing dir : EnumFacing.values())
+            if (!te.connectionIsEnabledGlobal(dir))
+                disabled |= 1 << dir.ordinal();
+        long key = te.getShape().id + 1;
+        key = (key << 3) | (te.getSide() & 7);
+        key = (key << 2) | (te.getTurn() & 3);
+        key = (key << 6) | disabled;
+        key = (key << 6) | (neighbourhood & 63);
+        key = (key << 1) | (renderBase ? 1 : 0);
+        key = (key << 1) | (renderSecondary ? 1 : 0);
+        return key;
+    }
+
+    /**
+     * Same as {@link #probe} but reuses the answer for a shape that has already
+     * been probed with the same {@link #keyFor key}. The returned sets are
+     * shared, so they must not be modified.
+     */
+    public static Set<Long> cornersOn(TileShape te, ITexture[] textures,
+                                      boolean renderBase, boolean renderSecondary,
+                                      int baseColour, int secondaryColour,
+                                      long key, EnumFacing boundary) {
+        if (key == NO_KEY)
+            return probe(te, textures, renderBase, renderSecondary, baseColour, secondaryColour).cornersOn(boundary);
+        Map<Long, Set<Long>[]> cache = PROBE_CACHE.get();
+        Set<Long>[] faces = cache.get(key);
+        if (faces == null) {
+            faces = probe(te, textures, renderBase, renderSecondary, baseColour, secondaryColour).faces;
+            if (cache.size() >= CACHE_LIMIT)
+                cache.clear();
+            cache.put(key, faces);
+        }
+        return faces[boundary.ordinal()];
+    }
+
+    /** No cache key: the geometry depends on something that cannot be summarised. */
+    public static final long NO_KEY = -1L;
+
+    private static final int CACHE_LIMIT = 512;
+
+    private static final ThreadLocal<Map<Long, Set<Long>[]>> PROBE_CACHE =
+            new ThreadLocal<Map<Long, Set<Long>[]>>() {
+                @Override
+                protected Map<Long, Set<Long>[]> initialValue() {
+                    return new HashMap<Long, Set<Long>[]>();
+                }
+            };
 
     /** Corners of the faces lying flat on the given boundary, or null. */
     public Set<Long> cornersOn(EnumFacing dir) {

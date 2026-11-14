@@ -169,9 +169,11 @@ public class ShapeRenderDispatch implements ICustomRenderer {
                                 new RenderTargetWorld.NeighbourGeometry() {
                                     @Override
                                     public Set<Long> cornersOn(TileShape neighbour, EnumFacing boundary) {
-                                        return ShapeProbe.probe(neighbour, probeTextures,
+                                        long key = ShapeProbe.keyFor(neighbour, probeBase, probeSecondary);
+                                        return ShapeProbe.cornersOn(neighbour, probeTextures,
                                                 probeBase, probeSecondary,
-                                                probeBaseColour, probeSecondaryColour).cornersOn(boundary);
+                                                probeBaseColour, probeSecondaryColour,
+                                                key, boundary);
                                     }
                                 });
                     }

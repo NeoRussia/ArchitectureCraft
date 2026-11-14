@@ -2,6 +2,11 @@
 
 ## 3.108-0.4
 
+- Redrawing a chunk that holds shapes costs a fraction of what it did. Light
+  was sampled from the world once per vertex and the shape's own light value
+  re-read for every sampled cell; both are now read once per shape, and
+  repeated neighbour checks behind the translucent seam culling are cached. A
+  dense wall of shapes re-bakes about three to four times faster.
 - Fence picking uses the selection box again instead of the collision list, so
   a click on a fence cap reports the top face and blocks can be placed on
   fences. Collision arms narrowed to vanilla's 2 px.

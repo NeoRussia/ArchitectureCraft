@@ -167,6 +167,20 @@ public abstract class ShapeKind {
         return false;
     }
 
+    /**
+     * A summary of everything outside the tile that decides where this shape's
+     * faces land, for the probe cache, or -1 when that cannot be summarised.
+     *
+     * <p>Probing a neighbour and reusing the answer is only sound if the answer
+     * depends on nothing but the key. Roof and window shapes read the shapes
+     * around them while drawing (slope junctions, window frames), so they
+     * return -1 and are probed afresh. A kind that adds a new neighbour
+     * dependency inherits that safe default until it says otherwise.</p>
+     */
+    public long neighbourSignature(TileShape te) {
+        return -1L;
+    }
+
     public void onChiselUse(TileShape te, EntityPlayer player, EnumFacing face, Vector3 hit) {
         EnumFacing side = this.usesConnections() ? this.zoneHit(face, hit) : null;
         //ArchitectureLog.info("ShapeKind.onChiselUse: face = %s, hit = %s, side = %s\n", face, hit, side);
@@ -472,6 +486,12 @@ public abstract class ShapeKind {
             return true;
         }
 
+        /** A fixed model: nothing outside the block changes where its faces go. */
+        @Override
+        public long neighbourSignature(TileShape te) {
+            return 0L;
+        }
+
         @Override
         public AxisAlignedBB getBounds(TileShape te, IBlockAccess world, BlockPos pos, IBlockState state,
                                        Entity entity, Trans3 t) {
@@ -724,6 +744,12 @@ public abstract class ShapeKind {
         @Override
         public int getLightOpacity() {
             return 0;
+        }
+
+        /** Draws nothing, so it can share the cached empty result. */
+        @Override
+        public long neighbourSignature(TileShape te) {
+            return 0L;
         }
 
         @Override
